@@ -123,7 +123,7 @@ import { BackgroundImageset, supportsTouchscreen, useWWTKeyboardControls, Credit
 import { useDisplay } from "vuetify";
 import { D2R, H2R  } from "@wwtelescope/astro";
 import { AstroCalc, Color, SpreadSheetLayer } from "@wwtelescope/engine";
-import { CoordinatesType, MarkerScales, ReferenceFrames, SolarSystemObjects } from "@wwtelescope/engine-types";
+import { CoordinatesType, MarkerScales, PlotTypes, ReferenceFrames, SolarSystemObjects } from "@wwtelescope/engine-types";
 import ArtemisTimeControl from "./components/ArtemisTimeControl.vue";
 
 import { useCameraUrl } from "./composables/useCameraUrl";
@@ -189,9 +189,12 @@ const urlTime = new URLSearchParams(window.location.search).get("time");
 
 const INITIAL_TIME = ref(urlTime ? new Date(+urlTime) : new Date("2026-04-06T22:32:00Z"));
 const INITIAL_VIEW: CameraView = {
-  lng: 169.906038,
-  lat: 1.323000,
-  zoomDeg: 0.000163,
+  // lng: 169.906038,
+  lng: 168.007573,
+  // lat: 1.323000,
+  lat: 3.591000,
+  // zoomDeg: 0.000163,
+  zoomDeg: 0.000157,
   rotationDeg: 0,
   angleDeg: 0,
   time: INITIAL_TIME.value.getTime()
@@ -288,13 +291,14 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_cartesianScale(AltUnits.astronomicalUnits);
       layer.set_altUnit(AltUnits.astronomicalUnits);
       layer.set_markerScale(MarkerScales.screen);
-      layer.set_scaleFactor(20);
+      layer.set_plotType(PlotTypes.gaussian)
+      layer.set_scaleFactor(30);
       layer.set_color(Color.fromHex("#ff0000"));
       layer.set_showFarSide(true);
       layer.set_opacity(100);
       layer.set_startDateColumn(1);
       layer.set_endDateColumn(5);
-      layer.set_decay(5 / (60 * 24));
+      layer.set_decay(1. / (60 * 24));
       layer.set_timeSeries(true);
       layers.value.push(layer);
     });
