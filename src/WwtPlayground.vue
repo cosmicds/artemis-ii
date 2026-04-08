@@ -75,7 +75,8 @@
             id="body-logos"
           >
             <CreditLogos
-              :default-logos="['cosmicds', 'wwt']"
+              :default-logos="['cosmicds', 'wwt', 'sciact', 'nasa']"
+              logo-size="2.5em"
             />
             <p class="toolkit-credit">
               Interactive developed using the
@@ -555,6 +556,7 @@ and remember, position:absolute is still a positioned parent, so children can be
   #icons-container {
     display: flex;
     justify-content: flex-end;
+    gap: 4px;
   }
 
   .toolkit-credit {
