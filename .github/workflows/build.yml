@@ -9,7 +9,7 @@ permissions: read-all
 
 jobs:
   build:
-    if: ${{ github.repository_owner == 'johnarban' }}
+    if: ${{ github.repository_owner == 'cosmicds' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,14 +27,11 @@ jobs:
       - name: Use Yarn 4
         run: |
           corepack enable
-          yarn set version 4.5.3
+          yarn set version 4.12.0
 
 
       - name: Yarn install
         run: yarn install --immutable
-
-      - name: Patch WWT engine
-        run: ./patch.sh
 
       - name: Lint
         run: yarn lint
