@@ -47,11 +47,14 @@
           </div>
           <div id="right-buttons">
             <button
-              class="artemis-btn"
+              :class="['artemis-btn', 'copy-btn', copySuccess ? 'copy-success' : '']"
               @click="copyViewUrl"
               @keyup.enter="copyViewUrl"
+              
             >
-              Copy view URL
+              <span>{{copySuccess ? 'Copied URL!' : 'Copy view URL'}}
+              <!-- <v-icon v-if="copySuccess" color="#32cd32" icon="mdi-check-circle"></v-icon>  -->
+              </span>
             </button>
             <button
               class="artemis-btn"
@@ -65,7 +68,7 @@
               @click="trackingCenter = SolarSystemObjects.earth"
               @keyup.enter="trackingCenter = SolarSystemObjects.earth"
             >
-              Track Earh
+              Track Earth
             </button>
           </div>
         </div>
@@ -233,6 +236,9 @@ function doWWTHacks() {
 import { AltUnits } from "@wwtelescope/engine-types";
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 let copyViewUrl: () => Promise<void> = async () => {};
+const copySuccess = ref(false);
+  
+  
 import { loadHorizonsVectorsForWwt } from "./horizons";
 import SplashScreen from "./components/SplashScreen.vue";
 const layers = ref<SpreadSheetLayer[]>([]);
@@ -373,7 +379,7 @@ onMounted(() => {
     createArtemisLayers(trackingCenter.value);
     
 
-    ({ copyViewUrl } = useCameraUrl(INITIAL_VIEW));
+    ({ copyViewUrl } = useCameraUrl(INITIAL_VIEW, copySuccess));
     positionSet.value = true;
     layersLoaded.value = true;
   });
@@ -553,6 +559,16 @@ and remember, position:absolute is still a positioned parent, so children can be
     padding: 4px 10px;
     cursor: pointer;
     &:hover { background: rgba(255, 255, 255, 0.25); }
+  }
+  
+  .copy-btn {
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 15ch;
+
+    &.copy-success {
+      border-color: #0ee7e3;
+      box-shadow: 0 0 6px 1px rgba(7, 105, 226, 0.6);
+    }
   }
 }
 
