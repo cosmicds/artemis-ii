@@ -22,6 +22,10 @@ yarn
     - To preview the story using the development server, run `yarn dev`
     - To build the story for production use, run `yarn build`
 
+### Notes
+
+This interactive modifies the WWT render loop, and in particular adjusts some of the 3D drawing functionality. As the class that serves as the primary handle for 3D planet-drawing methods in WWT is not exported from the core WWT web engine JavaScript package, we have a small `patch.sh` script that injects that import into the built web engine file.
+
 ## Deployment and Github Actions
 
 The built story is just a set of HTML/CSS/JS + assets, so it should be easy to host anywhere. For the purposes of this interactive, we're using GitHub Pages. This repository contains two workflows (see the `.github/workflows` directory) to help with this:
