@@ -257,6 +257,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_color(Color.fromHex("#ffffff"));
       layer.set_showFarSide(true);
       layer.set_opacity(25);
+      layers.value.push(layer);
     });
   
 
@@ -282,7 +283,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_endDateColumn(5);
       layer.set_decay(5 / (60 * 24));
       layer.set_timeSeries(true);
-
+      layers.value.push(layer);
     });
   });
   
@@ -314,7 +315,9 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
 }
 
 function removeArtemisLayers() {
+  console.log('remove layers');
   layers.value.forEach(layer => store.deleteLayer(layer.id.toString()));
+  layers.value = [];
 }
 
 onMounted(() => {
