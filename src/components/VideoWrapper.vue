@@ -1,0 +1,91 @@
+<template>
+  <v-dialog
+    id="video-container"
+    v-model="showVideoSheet"
+    transition="slide-y-transition"
+    fullscreen
+  >
+    <div class="video-wrapper">
+      <font-awesome-icon
+        id="video-close-icon"
+        class="close-icon"
+        icon="times"
+        size="lg"
+        tabindex="0"
+        @click="showVideoSheet = false"
+        @keyup.enter="showVideoSheet = false"
+      ></font-awesome-icon>
+
+      <iframe
+        id="info-video"
+        height="700"
+        :src="src"
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </v-dialog>
+</template>
+
+<script setup lang="ts">
+interface VideoProps {
+  src: string;
+}
+
+defineProps<VideoProps>();
+
+const showVideoSheet = defineModel<boolean>({ default: false });
+</script>
+
+<style lang="less">
+#video-icon-dummy
+{
+  pointer-events: none;
+  visibility: hidden;
+}
+
+#video-icon-wrapper
+{
+  display: initial;
+}
+
+
+.video-wrapper
+{
+  display: flex;
+  padding: 10px;
+  height: 100%;
+  max-width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  text-align: center;
+  z-index: 1000;
+  // border: 1px solid white;
+}
+
+video,
+#info-video
+{
+  margin: auto;
+  height: 90%;
+  // width: fit-content;
+  max-width: 95%;
+  object-fit: contain;
+  aspect-ratio: 9/17;
+}
+
+#video-container
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0px;
+  z-index: 1000;
+}
+</style>
