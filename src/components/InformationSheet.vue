@@ -70,7 +70,7 @@
             <p class="mt-3">
               From Earth's point of view, Artemis's path to the Moon and back is roughly like your point of view of the ball on the train. Its motion is directly away from Earth and back. Meanwhile, the Moon is orbiting around Earth, so Artemis's path has to account for where the Moon will be at the point of fly by.
             </p>
-            <p>
+            <p class="mt-3">
               The Moon's point of view is more like the view of your friend on the ground who watches the train coming from afar. Both paths are correct, but they look different because the Earth and the Moon are moving relative to each other. This is relativity in action!
             </p> 
           </v-card-text>
