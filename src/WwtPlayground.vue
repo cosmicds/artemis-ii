@@ -65,6 +65,13 @@
             </button>
             <button
               class="artemis-btn"
+              @click="showSkyBackground = !showSkyBackground"
+              @keyup.enter="showSkyBackground = !showSkyBackground"
+            >
+              {{ showSkyBackground ? 'Hide' : 'Show' }} background
+            </button>
+            <button
+              class="artemis-btn"
               @click="trackingCenter = SolarSystemObjects.moon"
               @keyup.enter="trackingCenter = SolarSystemObjects.moon"
             >
@@ -306,7 +313,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_cartesianScale(AltUnits.astronomicalUnits);
       layer.set_altUnit(AltUnits.astronomicalUnits);
       layer.set_markerScale(MarkerScales.screen);
-      layer.set_scaleFactor(10);
+      layer.set_scaleFactor(1);
       layer.set_color(Color.fromHex("#ffffff"));
       layer.set_showFarSide(true);
       layer.set_opacity(25);
@@ -374,6 +381,8 @@ function removeArtemisLayers() {
   layers.value = [];
 }
 
+const showSkyBackground = ref(true);
+
 onMounted(() => {
   store.waitForReady().then(async () => {
     WWTControl.singleton.set_zoomMax(ZOOM_MAX);
@@ -385,7 +394,8 @@ onMounted(() => {
     store.setBackgroundImageByName("Solar System");
     store.applySetting(["actualPlanetScale", true]);
     store.applySetting(["solarSystemCosmos", true]);
-    store.applySetting(["solarSystemMilkyWay", true]);
+    store.applySetting(["solarSystemMilkyWay", showSkyBackground.value]);
+    store.applySetting(["solarSystemStars", showSkyBackground.value]);
     store.setTrackedObject(SolarSystemObjects.moon);
 
     // @ts-expect-error this does exist
@@ -414,6 +424,15 @@ onMounted(() => {
     positionSet.value = true;
     layersLoaded.value = true;
   });
+});
+
+watch(showSkyBackground, (show) => {
+  try {
+    store.applySetting(["solarSystemMilkyWay", show]);
+    store.applySetting(["solarSystemStars", show]);
+  } catch {
+    return;
+  }
 });
 
 watch(trackingCenter, (trackedObject) => {
@@ -647,6 +666,20 @@ and remember, position:absolute is still a positioned parent, so children can be
   }
 }
 
+
+.icon-wrapper {
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    cursor: pointer;
+    &:hover { background: rgba(255, 255, 255, 0.25); }
+  }
+  
+
 #bottom-content {
   display: flex;
   flex-direction: column;
@@ -676,10 +709,10 @@ and remember, position:absolute is still a positioned parent, so children can be
 }
 
 // From Sara Soueidan (https://www.sarasoueidan.com/blog/focus-indicators/) & Erik Kroes (https://www.erikkroes.nl/blog/the-universal-focus-state/)
-:focus-visible, .focus-visible, .v-selection-control--focus-visible .v-selection-control__input {
+:focus-visible {
   /* Keep this override outside Vuetify's layers so it wins without !important. */
-  outline: 6px double white;
-  box-shadow: 0 0 0 3px black;
+  outline: 4px double white;
+  box-shadow: 0 0 0 2px black;
   border-radius: .025rem;
 }
 
