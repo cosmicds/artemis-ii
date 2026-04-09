@@ -435,7 +435,7 @@ const cssVars = computed(() => {
 // for a display with a side-panel this is generally
 // what we want
 .v-application__wrap {
-  flex-direction: row;  // add for the side panel
+  flex-direction: row-reverse;  // add for the side panel
   max-height: 100svh;  // force the application to be 100%
 }
 
