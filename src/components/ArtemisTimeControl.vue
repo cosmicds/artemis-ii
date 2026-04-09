@@ -1,24 +1,48 @@
 <template>
-  <div class="artemis-tracker">
-    <div class="artemis-labels">
-      <span class="left-time">{{ formatDate(MISSION_START) }}</span>
-      <span class="current-time">{{ formatDate(currentTime) }}</span>
-      <span class="right-time">{{ formatDate(MISSION_END) }}</span>
-    </div>
-    <input
-      type="range"
-      class="time-slider"
-      :min="MISSION_START.getTime()"
-      :max="MISSION_END.getTime()"
-      :step="STEP_MS"
-      :value="currentTime.getTime()"
-      @input="onSliderInput"
+  <div class="artemis-play-input">
+    <v-btn
+      class="artemis-play"
+      :icon="play ? 'mdi-pause' : 'mdi-play'"
+      color="#ffa000"
+      variant="tonal"
+      density="comfortable"
+      @click="play = !play"
     />
+    <div class="artemis-tracker">
+      <div class="artemis-labels">
+        <span class="left-time">{{ formatDate(MISSION_START) }}</span>
+        <span class="current-time">{{ formatDate(currentTime) }}</span>
+        <span class="right-time">{{ formatDate(MISSION_END) }}</span>
+      </div>
+      <input
+        type="range"
+        class="time-slider"
+        :min="MISSION_START.getTime()"
+        :max="MISSION_END.getTime()"
+        :step="STEP_MS"
+        :value="currentTime.getTime()"
+        @input="onSliderInput"
+      />
+    </div>
+    <div class="artemis-rate">
+      <!-- {{ rates[0][0] }} -->
+      <label>Speed:
+        <select v-model="rate">
+          <option 
+            v-for="[label, value] in rates" 
+            :key="value" 
+            :value="value"
+          >
+            {{ label }}
+          </option>
+        </select>
+      </label>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
+import { watch, ref } from "vue";
 import { SpaceTimeController } from "@wwtelescope/engine";
 
 interface Props {
@@ -32,7 +56,6 @@ const currentTime = defineModel<Date>('time', {default: new Date()});
 SpaceTimeController.set_now(props.initialTime);
 console.log(currentTime.value, props.initialTime);
 watch(currentTime, (date) => {
-  console.log('time changed');
   SpaceTimeController.set_now(date);
 });
 
@@ -78,10 +101,82 @@ watch(
   },
   { immediate: true },
 );
+
+
+
+const PLAY_INTERVAL_MS = 5;
+
+// step ms to advance per tick given desired playback speed
+function stepMs(daysPerSecond: number): number {
+  let realStep = daysPerSecond * 24 * 60 * 60 * 1000 * PLAY_INTERVAL_MS / 1000;
+  realStep =  realStep + (realStep % STEP_MS); // round to nearest step
+  return realStep;
+}
+const rates = [
+  ['2 hr/sec', stepMs(1/24)],
+  ['~1.5 days/sec', stepMs(35/24)],
+  ['~3 days/sec', stepMs(3)],
+] as const;
+
+const rate = ref(rates[1][1]);
+
+let interval: number | null = null;
+function setupInterval(stepMs: number) {
+  if (play.value) {
+    interval = setInterval(() => {
+      const newTime = new Date(currentTime.value.getTime() + stepMs);
+      if (newTime > MISSION_END) {
+        applyTime(MISSION_START);
+        return;
+      }
+      applyTime(newTime);
+    }, PLAY_INTERVAL_MS);
+  }
+}
+
+watch(rate, (newRate) => {
+  console.log("Rate changed to", newRate);
+  if (play.value) {
+    if (interval) {
+      clearInterval(interval);
+    }
+    setupInterval(newRate);
+  }
+}); 
+
+const play = ref(false);
+watch(play, (isPlaying) => {
+  if (isPlaying) {
+    if (!interval) {
+      setupInterval(rate.value);
+    }
+  } else {
+    if (interval) {
+      clearInterval(interval);
+      interval = null;
+    }
+  }
+});
+
 </script>
 
-<style scoped lang="less">
+<style scoped>
+
+.artemis-play-input {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.artemis-play {
+  grid-area: 1 / 1 / 3 / 2;
+  pointer-events: auto;
+}
+
 .artemis-tracker {
+  grid-area: 1 / 2 / 2 / 3;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
@@ -115,5 +210,13 @@ watch(
 .time-slider {
   width: 100%;
   accent-color: rgb(255, 160, 0);
+}
+
+.artemis-rate {
+  grid-area: 2 / 2 / 3 / 3;
+  pointer-events: auto;
+  color: #fff;
+  font-size: 0.78rem;
+  opacity: 0.8;
 }
 </style>

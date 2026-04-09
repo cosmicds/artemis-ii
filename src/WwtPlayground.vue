@@ -377,8 +377,8 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_showFarSide(true);
       layer.set_opacity(100);
       layer.set_startDateColumn(1);
-      layer.set_endDateColumn(5);
-      layer.set_decay(1. / (60 * 24));
+      layer.set_endDateColumn(1);
+      layer.set_decay(4.99 / (60 * 24));
       layer.set_timeSeries(true);
       layers.value.push(layer);
     });
