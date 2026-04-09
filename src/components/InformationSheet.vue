@@ -48,12 +48,31 @@
             <h4 class="user-guide-header">
               Tracking Artemis II
             </h4>
-            <p>
-              Place Holder
+            <p class="mt-1">
+              On April 1, 2026, the Artemis II crew began their 10-day journey to fly by the Moon and back to Earth. On the way, they have sent back breathtaking images of both the Moon and the Earth that are inspiring a new generation.
             </p>
-            <h4 class="user-guide-header mt-5">
-              Technical Note
+            <p class="mt-3">
+              In this interactive view, you can:
+            </p>
+            <ul class="ml-5">
+              <li>recreate Artemis's views of Earth and the Moon from space.</li>
+              <li>follow along the Artemis II path, either from the point of view of Earth or the Moon!</li>
+            </ul>
+            <h4 class="mt-6">
+              Why two paths?
             </h4>
+            <p class="mt-1">
+              If you're wondering why Artemis's path looks so different from Earth's perspective vs the Moon's, the answer has to do with Einstein's theory of relativity. Relativity tells us that an object's motion looks different when viewed from "reference frames" that are moving relative to each other. 
+            </p>
+            <p class="mt-3">
+              Imagine, for example, that you are on a moving train with clear walls. If you throw a ball in the air, you see it go straight up and straight down. If your friend on the ground watches the ball as the train goes by, they see the ball traveling up and down in an arc. 
+            </p>
+            <p class="mt-3">
+              From Earth's point of view, Artemis's path to the Moon and back is roughly like your point of view of the ball on the train. Its motion is directly away from Earth and back. Meanwhile, the Moon is orbiting around Earth, so Artemis's path has to account for where the Moon will be at the point of fly by.
+            </p>
+            <p>
+              The Moon's point of view is more like the view of your friend on the ground who watches the train coming from afar. Both paths are correct, but they look different because the Earth and the Moon are moving relative to each other. This is relativity in action!
+            </p> 
           </v-card-text>
         </v-card>
       </v-window-item>
@@ -62,9 +81,6 @@
       <v-window-item>
         <v-card class="scrollable">
           <v-card-text class="info-text scrollable">
-            <h4 class="user-guide-header">
-              Tracking Artemis II
-            </h4>
             <p>
               This <a
                 href="https://www.worldwidetelescope.org/home"
@@ -77,7 +93,7 @@
               Technical Note
             </h4>
 
-            <ul>
+            <ul class="ml-5">
               <li>Data is a JPL Horizons Vector Table for Artemis II, centered on the Earth (Goecenter [code: 500]). </li>
               <li class="li">
                 Data is current as of Apr 08, 2026 21:35 UTC 
@@ -177,18 +193,6 @@ OBJ_DATA='YES'</pre>
                   ? "" : "" }} (Keyboard option coming soon)<br>
               </v-col>
             </v-row>
-            <v-row>
-              <v-col cols="12">
-                <h4 class="user-guide-header">
-                  Controls
-                </h4>
-                <ul class="text-list mx-5">
-                  <li>
-                    <strong>Select Background</strong>: Choose from DSS, 2MASS, SDSS, or unWISE.
-                  </li>
-                </ul>
-              </v-col>
-            </v-row>
               
             <!-- Credits -->
             <v-row>
@@ -204,8 +208,8 @@ OBJ_DATA='YES'</pre>
                       rel="noopener noreferrer"
                     >CosmicDS</a>
                   </h5>
-                  <p>Jon Carifio</p>
                   <p>John Lewis</p>
+                  <p>Jon Carifio</p>
                   <p>Pat Udomprasert</p>
                   <p>Alyssa Goodman</p>
 
@@ -262,11 +266,7 @@ defineProps<Props>();
 }
 
 .info-text {
-
-  p {
-    margin-block: 0.5em;
-  }
-
+ 
   a {
     color: var(--accent-color-2)
   }
