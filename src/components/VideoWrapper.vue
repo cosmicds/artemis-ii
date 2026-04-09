@@ -4,6 +4,7 @@
     v-model="showVideoSheet"
     transition="slide-y-transition"
     fullscreen
+    close-on-content-click
   >
     <div class="video-wrapper">
       <font-awesome-icon
