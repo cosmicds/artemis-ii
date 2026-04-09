@@ -91,7 +91,7 @@
               @click="showTrajectory = !showTrajectory"
               @keyup.enter="showTrajectory = !showTrajectory"
             >
-              {{ showSkyBackground ? 'Hide' : 'Show' }} Trajectory
+              {{ showTrajectory ? 'Hide' : 'Show' }} Artemis Path
             </button>
             
             <hr />
