@@ -83,7 +83,7 @@
               @click="showSkyBackground = !showSkyBackground"
               @keyup.enter="showSkyBackground = !showSkyBackground"
             >
-              {{ showSkyBackground ? 'Hide' : 'Show' }} background
+              {{ showSkyBackground ? 'Hide' : 'Show' }} Stars
             </button>
             
             <button
