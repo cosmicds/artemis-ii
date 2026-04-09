@@ -85,6 +85,7 @@
 
         <div id="bottom-content">
           <ArtemisTimeControl 
+            v-model:time="currentTime"
             :can-create="positionSet" 
             :initial-time="INITIAL_TIME" 
           />
@@ -192,8 +193,8 @@ const accentColor = ref("#ffa000");
 const buttonColor = ref("#ffffff");
 
 const urlTime = new URLSearchParams(window.location.search).get("time");
-
-const INITIAL_TIME = ref(urlTime ? new Date(+urlTime) : new Date("2026-04-06T22:32:00Z"));
+const HOME_TIME = new Date("2026-04-06T22:32:00Z");
+const INITIAL_TIME = ref(urlTime ? new Date(+urlTime) : HOME_TIME);
 const INITIAL_VIEW: CameraView = {
   // lng: 169.906038,
   lng: 168.007573,
@@ -206,6 +207,28 @@ const INITIAL_VIEW: CameraView = {
   time: INITIAL_TIME.value.getTime()
 };
 
+// http://localhost:5174/?lng=316.555988&lat=74.277000&fov=0.017202&rot=0.000000&angle=0.000000&time=1775474823266
+const EARTH_VIEW: CameraView = {
+  lng: 316.555988,
+  lat: 74.277000,
+  zoomDeg: 0.017202,
+  rotationDeg: 0,
+  angleDeg: 0,
+  time: 1775474823266
+};
+// const HOME_VIEW: CameraView = {
+//   // lng: 169.906038,
+//   lng: 168.007573,
+//   // lat: 1.323000,
+//   lat: 3.591000,
+//   // zoomDeg: 0.000163,
+//   zoomDeg: 0.000157,
+//   rotationDeg: 0,
+//   angleDeg: 0,
+//   time: HOME_TIME.getTime()
+// };
+
+
 const zoomSliderValue = computed(() => fovToSlider(store.zoomDeg));
 
 function onZoomSlider(e: Event) {
@@ -216,7 +239,11 @@ function onZoomSlider(e: Event) {
   WWTControl.singleton.renderOneFrame();
 }
 
+const currentTime = ref(INITIAL_TIME.value);
+
 function goHome() {
+  currentTime.value = INITIAL_TIME.value;
+  trackingCenter.value = SolarSystemObjects.moon;
   moveViewCamera(INITIAL_VIEW, false);
 }
 
@@ -392,6 +419,9 @@ onMounted(() => {
 watch(trackingCenter, (trackedObject) => {
   removeArtemisLayers();
   store.setTrackedObject(trackedObject);
+  if (trackedObject === SolarSystemObjects.earth) {
+    moveViewCamera(EARTH_VIEW, false);
+  }
   createArtemisLayers(trackedObject);
 });
 

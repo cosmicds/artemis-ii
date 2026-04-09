@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { watch } from "vue";
 import { SpaceTimeController } from "@wwtelescope/engine";
 
 interface Props {
@@ -27,6 +27,25 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+  
+const currentTime = defineModel<Date>('time', {default: new Date()});
+SpaceTimeController.set_now(props.initialTime);
+console.log(currentTime.value, props.initialTime);
+watch(currentTime, (date) => {
+  console.log('time changed');
+  SpaceTimeController.set_now(date);
+});
+
+function applyTime(date: Date) {
+  currentTime.value = date;
+}
+
+function onSliderInput(e: Event) {
+  applyTime(new Date(parseInt((e.target as HTMLInputElement).value)));
+}
+
+
+
 
 const MISSION_START = new Date("2026-04-02T01:58:32Z");
 const MISSION_END   = new Date("2026-04-10T23:54:30Z");
@@ -34,7 +53,7 @@ const STEP_MS       = 5 * 60 * 1000;
 
 const INITIAL_TIME = props.initialTime; //new Date("2026-04-06T22:32:00Z");
 
-const currentTime = ref(INITIAL_TIME);
+// const currentTime = ref(INITIAL_TIME);
 
 function formatDate(d: Date): string {
   return d.toLocaleString(undefined, {
@@ -46,14 +65,8 @@ function formatDate(d: Date): string {
   });
 }
 
-function applyTime(date: Date) {
-  currentTime.value = date;
-  SpaceTimeController.set_now(date);
-}
 
-function onSliderInput(e: Event) {
-  applyTime(new Date(parseInt((e.target as HTMLInputElement).value)));
-}
+
 
 watch(
   () => props.canCreate,
