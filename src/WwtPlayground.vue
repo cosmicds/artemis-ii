@@ -246,7 +246,7 @@ const layersLoaded = ref(false);
 const positionSet = ref(false);
 const accentColor = ref("#ffa000");
 const buttonColor = ref("#ffffff");
-const VIDEO_URL = "https://youtu.be/ML9y0Z7A8ec?autoplay=1";
+const VIDEO_URL = "https://www.youtube.com/embed/ML9y0Z7A8ec?autoplay=1&mute=1";
 
 const urlTime = new URLSearchParams(window.location.search).get("time");
 const HOME_TIME = new Date("2026-04-06T22:32:00Z");
