@@ -38,6 +38,7 @@
             >
             </icon-button>
             <icon-button
+              v-if="!kiosk"
               icon="mdi-video"
               :color="buttonColor"
               tooltip-location="start"
