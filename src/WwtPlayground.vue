@@ -538,7 +538,8 @@ body {
   &.kiosk {
     a {
       pointer-events: none !important;
-      text-decoration: none !important;
+      text-decoration: inherit !important;
+      color: inherit !important;
     }
   }
 }
