@@ -29,6 +29,7 @@
               icon="mdi-home"
               :color="buttonColor"
               tooltip-location="start"
+              title="reset view"
               @activate="goHome"
             >
             </icon-button>
@@ -36,6 +37,7 @@
               icon="mdi-information-variant"
               :color="buttonColor"
               tooltip-location="start"
+              title="toggle info sheet"
               @activate="() => showInfoSheet = !showInfoSheet"
             >
             </icon-button>
@@ -43,6 +45,7 @@
             <input
               type="range"
               class="zoom-slider"
+              title="zoom slider"
               min="0"
               max="1"
               step="0.001"

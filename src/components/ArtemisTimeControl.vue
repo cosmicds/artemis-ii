@@ -6,6 +6,7 @@
       color="#ffa000"
       variant="tonal"
       density="comfortable"
+      title="play button"
       @click="play = !play"
     />
     <div class="artemis-tracker">
@@ -19,6 +20,7 @@
         class="time-slider"
         :min="MISSION_START.getTime()"
         :max="MISSION_END.getTime()"
+        title="time slider"
         :step="STEP_MS"
         :value="currentTime.getTime()"
         @input="onSliderInput"
@@ -26,8 +28,12 @@
     </div>
     <div class="artemis-rate">
       <!-- {{ rates[0][0] }} -->
-      <label>Speed:
-        <select v-model="rate">
+      <label for="artemis-rate-selector">Speed:
+        <select 
+          id="artemis-rate-selector"
+          v-model="rate"
+          name="playback rate" 
+        >
           <option 
             v-for="[label, value] in rates" 
             :key="value" 
