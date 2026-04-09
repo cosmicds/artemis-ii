@@ -38,19 +38,19 @@
             >
             </icon-button>
             <icon-button
-              icon="mdi-information-variant"
-              :color="buttonColor"
-              tooltip-location="start"
-              title="toggle info sheet"
-              @activate="() => showInfoSheet = !showInfoSheet"
-            >
-            </icon-button>
-            <icon-button
               icon="mdi-video"
               :color="buttonColor"
               tooltip-location="start"
               title="open video"
               @activate="showVideo = !showVideo"
+            >
+            </icon-button>
+            <icon-button
+              icon="mdi-information-variant"
+              :color="buttonColor"
+              tooltip-location="start"
+              title="toggle info sheet"
+              @activate="() => showInfoSheet = !showInfoSheet"
             >
             </icon-button>
             <span class="zoom-label">+</span>
