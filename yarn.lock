@@ -1164,6 +1164,8 @@ __metadata:
     eslint: "npm:^10.1.0"
     eslint-plugin-vue: "npm:^10.8.0"
     eslint-plugin-vuetify: "npm:^2.7.2"
+    focus-trap: "npm:^8.0.1"
+    focus-trap-vue: "npm:^4.1.0"
     globals: "npm:latest"
     less: "npm:^4.6.4"
     less-loader: "npm:^12.3.2"
@@ -3095,6 +3097,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"focus-trap-vue@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "focus-trap-vue@npm:4.1.0"
+  peerDependencies:
+    focus-trap: ^7.0.0
+    vue: ^3.0.0
+  checksum: 10c0/8942ba283666c4c8a8d130eb8779e268141832597ea1da1a05bdfdaabcb23913944bc6574b53d257c03cf9bd40b78734f623138ae97d0b45636a3f7c9f27dce1
+  languageName: node
+  linkType: hard
+
+"focus-trap@npm:^8.0.1":
+  version: 8.0.1
+  resolution: "focus-trap@npm:8.0.1"
+  dependencies:
+    tabbable: "npm:^6.4.0"
+  checksum: 10c0/341f8f90c87d9d4e70e85c0fb9c78927ea2eb8917f5a5fe95b3c00be9c713afbc18969feeb567379f58ddef22292ce8dcd5992a65875efc1fd923b18d28218ce
+  languageName: node
+  linkType: hard
+
 "fs-minipass@npm:^3.0.0":
   version: 3.0.3
   resolution: "fs-minipass@npm:3.0.3"
@@ -4422,6 +4443,13 @@ __metadata:
   version: 6.15.1
   resolution: "systemjs@npm:6.15.1"
   checksum: 10c0/106e5751a49dbe4acb17fa1474a43b27fd26efbee1b322c00c04c08f3e95de756adfba828d743af89bef7fa10888da8a5c5ceb55dae5c42e4909b151168ad192
+  languageName: node
+  linkType: hard
+
+"tabbable@npm:^6.4.0":
+  version: 6.4.0
+  resolution: "tabbable@npm:6.4.0"
+  checksum: 10c0/d931427f4a96b801fd8801ba296a702119e06f70ad262fed8abc5271225c9f1ca51b89fdec4fb2f22e1d35acb3d2881db0a17cedc758272e9ecb540d00299d76
   languageName: node
   linkType: hard
 

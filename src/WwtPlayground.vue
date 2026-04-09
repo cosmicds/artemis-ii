@@ -2,6 +2,7 @@
   <v-app
     id="app"
     :style="cssVars"
+    :class="[smallSize ? 'app-is-small' : '']"
   >
     <div
       id="main-content"
@@ -13,6 +14,11 @@
 
 
       <!-- This contains the splash screen content -->
+      <SplashScreen
+        :color="accentColor"
+        highlight-color="red"
+        :loaded="!isLoading"
+      />
 
 
       <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
@@ -24,6 +30,13 @@
               :color="buttonColor"
               tooltip-location="start"
               @activate="goHome"
+            >
+            </icon-button>
+            <icon-button
+              icon="mdi-information-variant"
+              :color="buttonColor"
+              tooltip-location="start"
+              @activate="() => showInfoSheet = !showInfoSheet"
             >
             </icon-button>
             <span class="zoom-label">+</span>
@@ -42,11 +55,13 @@
           </div>
           <div id="right-buttons">
             <button
-              class="artemis-btn"
+              :class="['artemis-btn', 'copy-btn', copySuccess ? 'copy-success' : '']"
               @click="copyViewUrl"
               @keyup.enter="copyViewUrl"
             >
-              Copy view URL
+              <span>{{ copySuccess ? 'Copied URL!' : 'Copy view URL' }}
+              <!-- <v-icon v-if="copySuccess" color="#32cd32" icon="mdi-check-circle"></v-icon>  -->
+              </span>
             </button>
             <button
               class="artemis-btn"
@@ -60,7 +75,7 @@
               @click="trackingCenter = SolarSystemObjects.earth"
               @keyup.enter="trackingCenter = SolarSystemObjects.earth"
             >
-              Track Earh
+              Track Earth
             </button>
           </div>
         </div>
@@ -69,13 +84,17 @@
         <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
         <div id="bottom-content">
-          <ArtemisTimeControl :can-create="positionSet" />
+          <ArtemisTimeControl 
+            :can-create="positionSet" 
+            :initial-time="INITIAL_TIME" 
+          />
           <div
             v-if="!smallSize"
             id="body-logos"
           >
             <CreditLogos
-              :default-logos="['cosmicds', 'wwt']"
+              :default-logos="['cosmicds', 'wwt', 'sciact', 'nasa']"
+              logo-size="2.5em"
             />
             <p class="toolkit-credit">
               Interactive developed using the
@@ -90,18 +109,14 @@
       </div>
     </div>
     <div
-      v-show="sheet === 'text'"
-      id="bottom-drawer"
+      id="side-drawer"
+      :class="[showInfoSheet ? 'side-drawer-open' : 'side-drawer-closed']"
     >
-      <article class="pa-5">
-        <h1>Bottom Drawer</h1>
-        <p>
-          Never gonna give you up.
-        </p>
-        <p>
-          Never gonnna let you down.
-        </p>
-      </article>
+      <InformationSheet
+        v-if="showInfoSheet"
+        v-model="showInfoSheet"
+        :text-color="accentColor"
+      />
     </div>
   </v-app>
 </template>
@@ -114,7 +129,7 @@ import { BackgroundImageset, supportsTouchscreen, useWWTKeyboardControls, Credit
 import { useDisplay } from "vuetify";
 import { D2R, H2R  } from "@wwtelescope/astro";
 import { AstroCalc, Color, SpreadSheetLayer } from "@wwtelescope/engine";
-import { CoordinatesType, MarkerScales, ReferenceFrames, SolarSystemObjects } from "@wwtelescope/engine-types";
+import { CoordinatesType, MarkerScales, PlotTypes, ReferenceFrames, SolarSystemObjects } from "@wwtelescope/engine-types";
 import ArtemisTimeControl from "./components/ArtemisTimeControl.vue";
 
 import { useCameraUrl } from "./composables/useCameraUrl";
@@ -168,21 +183,27 @@ const props = withDefaults(defineProps<WwtPlaygroundProps>(), {
   }
 });
 
-const splash = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
-const showSplashScreen = ref(splash);
+
 const backgroundImagesets = reactive<BackgroundImageset[]>([]);
-const sheet = ref<SheetType | null>(null);
+const showInfoSheet = ref(false);
 const layersLoaded = ref(false);
 const positionSet = ref(false);
-const accentColor = ref("#ffffff");
+const accentColor = ref("#ffa000");
 const buttonColor = ref("#ffffff");
+
+const urlTime = new URLSearchParams(window.location.search).get("time");
+
+const INITIAL_TIME = ref(urlTime ? new Date(+urlTime) : new Date("2026-04-06T22:32:00Z"));
 const INITIAL_VIEW: CameraView = {
-  lng: 169.906038,
-  lat: 1.323000,
-  zoomDeg: 0.000163,
+  // lng: 169.906038,
+  lng: 168.007573,
+  // lat: 1.323000,
+  lat: 3.591000,
+  // zoomDeg: 0.000163,
+  zoomDeg: 0.000157,
   rotationDeg: 0,
   angleDeg: 0,
-  opacity: 100,
+  time: INITIAL_TIME.value.getTime()
 };
 
 const zoomSliderValue = computed(() => fovToSlider(store.zoomDeg));
@@ -218,7 +239,12 @@ function doWWTHacks() {
 import { AltUnits } from "@wwtelescope/engine-types";
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 let copyViewUrl: () => Promise<void> = async () => {};
+const copySuccess = ref(false);
+  
+  
 import { loadHorizonsVectorsForWwt } from "./horizons";
+import SplashScreen from "./components/SplashScreen.vue";
+import InformationSheet from "./components/InformationSheet.vue";
 const layers = ref<SpreadSheetLayer[]>([]);
 
 const trackingCenter = ref<SolarSystemObjects>(SolarSystemObjects.moon);
@@ -257,6 +283,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_color(Color.fromHex("#ffffff"));
       layer.set_showFarSide(true);
       layer.set_opacity(25);
+      layers.value.push(layer);
     });
   
 
@@ -274,15 +301,16 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_cartesianScale(AltUnits.astronomicalUnits);
       layer.set_altUnit(AltUnits.astronomicalUnits);
       layer.set_markerScale(MarkerScales.screen);
-      layer.set_scaleFactor(20);
+      layer.set_plotType(PlotTypes.gaussian);
+      layer.set_scaleFactor(30);
       layer.set_color(Color.fromHex("#ff0000"));
       layer.set_showFarSide(true);
       layer.set_opacity(100);
       layer.set_startDateColumn(1);
       layer.set_endDateColumn(5);
-      layer.set_decay(5 / (60 * 24));
+      layer.set_decay(1. / (60 * 24));
       layer.set_timeSeries(true);
-
+      layers.value.push(layer);
     });
   });
   
@@ -314,7 +342,9 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
 }
 
 function removeArtemisLayers() {
+  console.log('remove layers');
   layers.value.forEach(layer => store.deleteLayer(layer.id.toString()));
+  layers.value = [];
 }
 
 onMounted(() => {
@@ -353,7 +383,7 @@ onMounted(() => {
     createArtemisLayers(trackingCenter.value);
     
 
-    ({ copyViewUrl } = useCameraUrl(INITIAL_VIEW));
+    ({ copyViewUrl } = useCameraUrl(INITIAL_VIEW, copySuccess));
     positionSet.value = true;
     layersLoaded.value = true;
   });
@@ -398,17 +428,58 @@ const cssVars = computed(() => {
   // after `#bottom-drawer` takes its own height.
 }
 
+// while #app is a flex, the direct parent
+// is .v-application__wrap
+// this takes the size of it's children
+// so we need to apply height definitions here
+// for a display with a side-panel this is generally
+// what we want
+.v-application__wrap {
+  flex-direction: row;  // add for the side panel
+  max-height: 100svh;  // force the application to be 100%
+}
+
+#app.app-is-small {
+  .v-application__wrap {
+    flex-direction: column;  // add for the side panel
+    max-height: 100svh;  // force the application to be 100%
+  }
+}
 
 #main-content {
   // This is the containing block for the absolutely positioned WWT host and overlay.
   position: relative;
   display: block; // don't need to set width. block elements stretch to fill their container by default.
-
   // Its height is determined by the flex layout in `#app`.
   flex: 1 0 auto;
   overflow: hidden;
 
   transition: height 0.1s ease-in-out;
+}
+
+#side-drawer {
+  flex: 0 0 auto;
+  overflow: hidden;
+  width: 0;
+  // transition: width 0.3s ease-in-out;
+
+  &.side-drawer-open {
+    width: 34%;
+  }
+}
+
+#app.app-is-small {
+  #side-drawer {
+  flex: 0 0 auto;
+  overflow: hidden;
+  height: 0;
+  width: 100%;
+  // transition: width 0.3s ease-in-out;
+
+  &.side-drawer-open {
+    height: 34%;
+  }
+}
 }
 
 /* The WWT host is out of flow so its measured size does not affect #main-content. */
@@ -534,6 +605,16 @@ and remember, position:absolute is still a positioned parent, so children can be
     cursor: pointer;
     &:hover { background: rgba(255, 255, 255, 0.25); }
   }
+  
+  .copy-btn {
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 15ch;
+
+    &.copy-success {
+      border-color: #0ee7e3;
+      box-shadow: 0 0 6px 1px rgba(7, 105, 226, 0.6);
+    }
+  }
 }
 
 #bottom-content {
@@ -552,6 +633,7 @@ and remember, position:absolute is still a positioned parent, so children can be
   #icons-container {
     display: flex;
     justify-content: flex-end;
+    gap: 4px;
   }
 
   .toolkit-credit {

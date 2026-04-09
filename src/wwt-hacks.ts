@@ -34,7 +34,7 @@ export interface CameraView {
   zoomDeg: number;
   rotationDeg: number;
   angleDeg: number;
-  opacity: number;
+  time: number,
 }
 
 /**

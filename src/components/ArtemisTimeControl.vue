@@ -23,6 +23,7 @@ import { SpaceTimeController } from "@wwtelescope/engine";
 
 interface Props {
   canCreate: boolean;
+  initialTime: Date;
 }
 
 const props = defineProps<Props>();
@@ -31,7 +32,7 @@ const MISSION_START = new Date("2026-04-02T01:58:32Z");
 const MISSION_END   = new Date("2026-04-10T23:54:30Z");
 const STEP_MS       = 5 * 60 * 1000;
 
-const INITIAL_TIME = new Date("2026-04-06T22:32:00Z");
+const INITIAL_TIME = props.initialTime; //new Date("2026-04-06T22:32:00Z");
 
 const currentTime = ref(INITIAL_TIME);
 
@@ -57,7 +58,10 @@ function onSliderInput(e: Event) {
 watch(
   () => props.canCreate,
   (canCreate) => {
-    if (canCreate) applyTime(INITIAL_TIME);
+    if (canCreate) {
+      applyTime(MISSION_START);
+      applyTime(INITIAL_TIME);
+    }
   },
   { immediate: true },
 );

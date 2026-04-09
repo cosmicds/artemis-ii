@@ -2,8 +2,9 @@ import { engineStore } from "@wwtelescope/engine-pinia";
 import { WWTControl } from "@wwtelescope/engine";
 import { R2D } from "@wwtelescope/astro";
 import { moveViewCamera, type CameraView } from "../wwt-hacks";
+import { Ref, watch } from 'vue';
 
-export function useCameraUrl(fallback: CameraView) {
+export function useCameraUrl(fallback: CameraView, successWatch: Ref<boolean>) {
   const store = engineStore();
 
   const lng         = () => ((360 - store.raRad * R2D) % 360);
@@ -11,6 +12,7 @@ export function useCameraUrl(fallback: CameraView) {
   const zoomDeg     = () => store.zoomDeg;
   const rotationDeg = () => store.rollRad * R2D;
   const angleDeg    = () => WWTControl.singleton.renderContext.viewCamera.angle;
+  const time        = () => store.currentTime.getTime();
 
   function readUrl(): CameraView {
     const p = new URLSearchParams(window.location.search);
@@ -20,7 +22,7 @@ export function useCameraUrl(fallback: CameraView) {
       zoomDeg:     +(p.get("fov")   ?? fallback.zoomDeg),
       rotationDeg: +(p.get("rot")   ?? fallback.rotationDeg),
       angleDeg:    +(p.get("angle") ?? fallback.angleDeg),
-      opacity:     fallback.opacity,
+      time:        +(p.get("time") ?? fallback.time),
     };
   }
 
@@ -31,13 +33,22 @@ export function useCameraUrl(fallback: CameraView) {
     url.searchParams.set("fov",   zoomDeg().toFixed(6));
     url.searchParams.set("rot",   rotationDeg().toFixed(6));
     url.searchParams.set("angle", angleDeg().toFixed(6));
+    url.searchParams.set("time", time().toString());
     return url.toString();
   }
 
   async function copyViewUrl() {
     await navigator.clipboard.writeText(buildViewUrl());
+    successWatch.value = true;
   }
 
+  watch(successWatch, success => {
+    if (success) {
+      setTimeout(() => {
+        successWatch.value = false;
+      }, 1800);
+    }
+  });
   // Apply initial view from URL (or fallback) once.
   moveViewCamera(readUrl(), true);
 
