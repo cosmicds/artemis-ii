@@ -102,14 +102,14 @@
               @click="trackingCenter = SolarSystemObjects.moon"
               @keyup.enter="trackingCenter = SolarSystemObjects.moon"
             >
-              Track Moon
+              Moon View
             </button>
             <button
               class="artemis-btn"
               @click="trackingCenter = SolarSystemObjects.earth"
               @keyup.enter="trackingCenter = SolarSystemObjects.earth"
             >
-              Track Earth
+              Earth View
             </button>
             
             <div 
