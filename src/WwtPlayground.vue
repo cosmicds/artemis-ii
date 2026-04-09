@@ -2,7 +2,7 @@
   <v-app
     id="app"
     :style="cssVars"
-    :class="[smallSize ? 'app-is-small' : '']"
+    :class="[smallSize ? 'app-is-small' : '', kiosk ? 'kiosk' : '']"
   >
     <div
       id="main-content"
@@ -38,11 +38,19 @@
             >
             </icon-button>
             <icon-button
+              v-if="!kiosk"
               icon="mdi-video"
               :color="buttonColor"
               tooltip-location="start"
               title="open video"
               @activate="showVideo = !showVideo"
+            ></icon-button>
+            <icon-button
+              v-if="kiosk && !fullscreen"
+              id="fullscreen-icon"
+              :icon="fullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+              :color="buttonColor"
+              @activate="fullscreen = !fullscreen"
             >
             </icon-button>
             <icon-button
@@ -85,7 +93,6 @@
             >
               {{ showSkyBackground ? 'Hide' : 'Show' }} Stars
             </button>
-            
             <button
               class="artemis-btn"
               @click="showTrajectory = !showTrajectory"
@@ -93,10 +100,7 @@
             >
               {{ showTrajectory ? 'Hide' : 'Show' }} Artemis Path
             </button>
-            
             <hr />
-            
-            
             <button
               class="artemis-btn"
               @click="trackingCenter = SolarSystemObjects.moon"
@@ -111,9 +115,9 @@
             >
               Earth View
             </button>
-            
-            <div 
-              v-if="!smallSize" 
+
+            <div
+              v-if="!smallSize"
               class="legend"
             >
               <p class="location">
@@ -128,13 +132,13 @@
         <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
         <div id="bottom-content">
-          <ArtemisTimeControl 
+          <ArtemisTimeControl
             v-model:time="currentTime"
-            :can-create="positionSet" 
-            :initial-time="INITIAL_TIME" 
+            :can-create="positionSet"
+            :initial-time="INITIAL_TIME"
           />
-          <div 
-            v-if="smallSize" 
+          <div
+            v-if="smallSize"
             class="legend legend-small"
           >
             <p class="location">
@@ -179,7 +183,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ref, reactive, computed, onMounted, watch } from "vue";
 import { GotoRADecZoomParams, engineStore } from "@wwtelescope/engine-pinia";
-import { BackgroundImageset, supportsTouchscreen, useWWTKeyboardControls, CreditLogos, IconButton } from "@cosmicds/vue-toolkit";
+import { BackgroundImageset, supportsTouchscreen, useWWTKeyboardControls, CreditLogos, IconButton, useFullscreen } from "@cosmicds/vue-toolkit";
 import { useDisplay } from "vuetify";
 import { D2R, H2R  } from "@wwtelescope/astro";
 import { AstroCalc, Color, SpreadSheetLayer } from "@wwtelescope/engine";
@@ -217,6 +221,13 @@ type CameraParams = Omit<GotoRADecZoomParams, "instant">;
 export interface WwtPlaygroundProps {
   wwtNamespace?: string;
   initialCameraParams?: CameraParams;
+}
+
+const fullscreen = useFullscreen();
+const searchParams = new URLSearchParams(window.location.search);
+const kiosk = searchParams.get("kiosk")?.toLowerCase() === "true";
+if (kiosk) {
+  document.body.classList.add("kiosk");
 }
 
 const store = engineStore();
@@ -323,19 +334,19 @@ import { AltUnits } from "@wwtelescope/engine-types";
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 let copyViewUrl: () => Promise<void> = async () => {};
 const copySuccess = ref(false);
-  
-  
+
+
 import { loadHorizonsVectorsForWwt } from "./horizons";
 import SplashScreen from "./components/SplashScreen.vue";
 import InformationSheet from "./components/InformationSheet.vue";
 const layers = ref<SpreadSheetLayer[]>([]);
 
 const trackingCenter = ref<SolarSystemObjects>(SolarSystemObjects.moon);
-  
+
 const showTrajectory = ref(true);
 
 async function createArtemisLayers(trackedObject: SolarSystemObjects) {
-  
+
   const vec = await loadHorizonsVectorsForWwt('./horizons_results-earth.txt', SolarSystemObjects.earth, trackedObject);
   const items = vec.split("\r\n");
   const header = items.shift();
@@ -351,7 +362,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
   bounds = [[0, centerStart], ...bounds, [centerEnd, end]];
   bounds.forEach((bds) => {
     const data = items.slice(...bds).join("\r\n");
-    
+
     if (showTrajectory.value) {
       store.createTableLayer({
         name: 'Artemis',
@@ -373,9 +384,9 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
         layers.value.push(layer);
       });
     }
-  
 
-    
+
+
     store.createTableLayer({
       name: 'Artemis Time',
       referenceFrame: 'Sky',
@@ -401,7 +412,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layers.value.push(layer);
     });
   });
-  
+
   const showMoonRefLayer = false;
   if (showMoonRefLayer) {
     const vecMoon = await loadHorizonsVectorsForWwt('./horizons_results-moon.txt', SolarSystemObjects.moon, trackedObject);
@@ -424,9 +435,9 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_opacity(25);
       layers.value.push(layer);
     });
-  
+
   }
-  
+
 }
 
 function removeArtemisLayers() {
@@ -472,7 +483,7 @@ onMounted(() => {
 
     store.setTrackedObject(trackingCenter.value);
     createArtemisLayers(trackingCenter.value);
-    
+
 
     ({ copyViewUrl } = useCameraUrl(INITIAL_VIEW, copySuccess));
     positionSet.value = true;
@@ -523,6 +534,16 @@ const cssVars = computed(() => {
 </script>
 
 <style lang="less">
+
+body {
+  &.kiosk {
+    a {
+      pointer-events: none !important;
+      text-decoration: inherit !important;
+      color: inherit !important;
+    }
+  }
+}
 
 // #app is a column flex container with two children:
 // #main-content and #bottom-drawer.
@@ -701,7 +722,7 @@ and remember, position:absolute is still a positioned parent, so children can be
   gap: 10px;
   align-items: flex-end;
   height: auto;
-  
+
   hr {
     margin-block: 0.25em;
     opacity: 0;
@@ -719,7 +740,7 @@ and remember, position:absolute is still a positioned parent, so children can be
     user-select: none;
     &:hover { background: rgba(255, 255, 255, 0.25); }
   }
-  
+
   .copy-btn {
     transition: border-color 0.2s, box-shadow 0.2s;
     width: 15ch;
@@ -751,7 +772,7 @@ and remember, position:absolute is still a positioned parent, so children can be
     cursor: pointer;
     &:hover { background: rgba(255, 255, 255, 0.25); }
   }
-  
+
 
 #bottom-content {
   display: flex;
