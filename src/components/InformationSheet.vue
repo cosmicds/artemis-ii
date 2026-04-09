@@ -57,14 +57,13 @@
             </p>
             <ul class="ml-5">
               <li>recreate Artemis's views of Earth and the Moon from space.</li>
-              <li>follow along the Artemis II path, either from the point of view of Earth or the Moon!</li>
+              <li>follow along the Artemis II path, either from the point of view of Earth or the Moon.</li>
             </ul>
             <h4 class="mt-6">
               Why two paths?
             </h4>
             <p class="mt-1">
-              If you're wondering why Artemis's path looks so different from Earth's perspective vs the Moon's, the answer has to do with your <strong>frame of reference</strong>. 
-              An object's motion looks different when viewed from reference frames that are moving relative to each other. 
+              If you're wondering why Artemis's path looks so different from Earth's perspective vs the Moon's, the answer is that Earth and the Moon are moving relative to each other. An object's motion looks different when viewed from <strong>reference frames</strong> that have relative motion. 
             </p>
             <h5> A ball on a train</h5>
             <p class="mt-3">
@@ -75,8 +74,8 @@
             <h5> The Earth & Moon</h5>
             <p class="mt-3">
               From Earth's point of view, Artemis's path to the Moon and back is roughly like your point of view of the ball on the train. 
-              Its motion is directly away from Earth and back. 
-              The Moon is orbiting around Earth, so Artemis's trajectory is time for where the Moon will be at the point of fly by.
+              Artemis's motion is directly away from Earth and back. 
+              The Moon is orbiting around Earth, so Artemis's trajectory is directed to where the Moon will be at the point of fly by.
             </p>
             <p class="mt-3">
               The Moon's point of view is more like the view of your friend on the ground who watches the train coming from afar. 
@@ -95,7 +94,7 @@
                 href="https://www.worldwidetelescope.org/home"
                 target="_blank"
                 rel="noopener noreferrer"
-              >WorldWide Telescope</a> (WWT) interactive provides an view of of the Artemis II 
+              >WorldWide Telescope</a> (WWT) interactive provides a view of of the Artemis II 
               trajectory, from ICPS separation (3h24m18s after launch) to splash down. 
             </p>
             <h4 class="user-guide-header mt-5">
@@ -103,7 +102,7 @@
             </h4>
 
             <ul class="ml-5">
-              <li>Data is a JPL Horizons Vector Table for Artemis II, centered on the Earth (Goecenter [code: 500]). </li>
+              <li>Data is a JPL Horizons Vector Table for Artemis II, centered on the Earth (Geocentric [code: 500]). </li>
               <li class="li">
                 Data is current as of Apr 08, 2026 21:35 UTC 
                 <details>
@@ -131,7 +130,10 @@ OBJ_DATA='YES'</pre>
               </li>
                 
               <li class="li">
-                Postion with respect to Moon may have a systematic offset
+                Postion with respect to Moon may have a systematic offset.
+              </li>
+              <li class="li">
+                Known bug: for some viewing angles, the Artemis path renders behind the Moon or Earth when it should be in front. 
               </li>
             </ul>
                 
