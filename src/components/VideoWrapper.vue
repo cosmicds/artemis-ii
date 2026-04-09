@@ -18,7 +18,6 @@
 
       <iframe
         id="info-video"
-        height="700"
         :src="src"
         title="YouTube video player"
         frameborder="0"
@@ -69,11 +68,10 @@ video,
 #info-video
 {
   margin: auto;
-  height: 90%;
-  // width: fit-content;
-  max-width: 95%;
+  width: min(95%, calc(90vh * 16 / 9));
+  height: auto;
+  aspect-ratio: 16/9;
   object-fit: contain;
-  aspect-ratio: 9/17;
 }
 
 #video-container
