@@ -102,7 +102,7 @@
             </h4>
 
             <ul class="ml-5">
-              <li>Data is a JPL Horizons Vector Table for Artemis II, centered on the Earth (Geocentric [code: 500]). </li>
+              <li>Data is a JPL Horizons Vector Table for Artemis II, centered on the Earth (Geocentric [code: 500]). Sampled every 5 minutes</li>
               <li class="li">
                 Data is current as of Apr 10, 2026 06:19 UTC 
                 <details>

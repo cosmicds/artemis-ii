@@ -63,7 +63,13 @@
               @activate="() => showInfoSheet = !showInfoSheet"
             >
             </icon-button>
-            <span class="zoom-label">+</span>
+            <button 
+              class="artemis-btn zoom-label"
+              @click="zoomIn"
+              @keyup.enter="zoomIn"
+            >
+              +
+            </button>
             <input
               type="range"
               class="zoom-slider"
@@ -74,7 +80,13 @@
               :value="zoomSliderValue"
               @input="onZoomSlider"
             />
-            <span class="zoom-label">−</span>
+            <button 
+              class="artemis-btn zoom-label"
+              @click="zoomOut"
+              @keyup.enter="zoomOut"
+            >
+              −
+            </button>
           </div>
           <div id="center-buttons">
           </div>
@@ -231,7 +243,34 @@ function fovToSlider(fov: number): number {
 function sliderToFov(t: number): number {
   return Math.exp(LOG_MIN + stretchSlider(t) * (LOG_MAX - LOG_MIN));
 }
-// watchWwtContainerSize('.wwtelescope-component', '#main-content');
+
+const zoomSliderValue = computed(() => fovToSlider(store.zoomDeg));
+
+function onZoomSlider(e: Event) {
+  const fov = sliderToFov(+(e.target as HTMLInputElement).value);
+  const rc = WWTControl.singleton.renderContext;
+  rc.targetCamera.zoom = fov;
+  rc.viewCamera.zoom   = fov;
+  WWTControl.singleton.renderOneFrame();
+}
+
+function zoomIn() {
+  const newZoom = store.zoomDeg / 1.25;
+  const clampedZoom = Math.max(newZoom, ZOOM_MIN);
+  const rc = WWTControl.singleton.renderContext;
+  rc.targetCamera.zoom = clampedZoom;
+  rc.viewCamera.zoom   = clampedZoom;
+  WWTControl.singleton.renderOneFrame();
+}
+
+function zoomOut() {
+  const newZoom = store.zoomDeg * 1.25;
+  const clampedZoom = Math.min(newZoom, ZOOM_MAX);
+  const rc = WWTControl.singleton.renderContext;
+  rc.targetCamera.zoom = clampedZoom;
+  rc.viewCamera.zoom   = clampedZoom;
+  WWTControl.singleton.renderOneFrame();
+}
 
 type SheetType = "text" | "video";
 
@@ -283,12 +322,9 @@ const urlTime = new URLSearchParams(window.location.search).get("time");
 const HOME_TIME = new Date("2026-04-06T22:32:00Z");
 const INITIAL_TIME = ref(urlTime ? new Date(+urlTime) : HOME_TIME);
 const INITIAL_VIEW: CameraView = {
-  // lng: 169.906038,
-  lng: 168.007573,
-  // lat: 1.323000,
-  lat: 3.591000,
-  // zoomDeg: 0.000163,
-  zoomDeg: 0.000157,
+  lng: 167.630072,
+  lat: -0.567000,
+  zoomDeg: 0.000230,
   rotationDeg: 0,
   angleDeg: 0,
   time: INITIAL_TIME.value.getTime()
@@ -315,16 +351,6 @@ const EARTH_VIEW: CameraView = {
 //   time: HOME_TIME.getTime()
 // };
 
-
-const zoomSliderValue = computed(() => fovToSlider(store.zoomDeg));
-
-function onZoomSlider(e: Event) {
-  const fov = sliderToFov(+(e.target as HTMLInputElement).value);
-  const rc = WWTControl.singleton.renderContext;
-  rc.targetCamera.zoom = fov;
-  rc.viewCamera.zoom   = fov;
-  WWTControl.singleton.renderOneFrame();
-}
 
 const currentTime = ref(INITIAL_TIME.value);
 
@@ -372,7 +398,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
   const N = 10;
   const centerStart = 1300;
   const centerEnd = 1500;
-  const end = 2600;
+  const end = items.length;
   for (let i = centerStart; i < centerEnd; i += N) {
     bounds.push([i, i + N]);
   }
@@ -394,8 +420,10 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
         layer.set_cartesianScale(AltUnits.astronomicalUnits);
         layer.set_altUnit(AltUnits.astronomicalUnits);
         layer.set_markerScale(MarkerScales.screen);
-        layer.set_scaleFactor(5);
+        // layer.set_scaleFactor(.0012);
+        layer.set_scaleFactor(12);
         layer.set_color(Color.fromHex("#ffffff"));
+        // layer.set_color(Color.fromHex("#c319e1"));
         layer.set_showFarSide(true);
         layer.set_opacity(25);
         layers.value.push(layer);
@@ -419,15 +447,17 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_markerScale(MarkerScales.screen);
       layer.set_plotType(PlotTypes.gaussian);
       layer.set_scaleFactor(30);
-      layer.set_color(Color.fromHex("#ff0000"));
+      layer.set_color(Color.fromHex("#df1c23")); // artemis
       layer.set_showFarSide(true);
       layer.set_opacity(100);
       layer.set_startDateColumn(1);
       layer.set_endDateColumn(1);
-      layer.set_decay(4.99 / (60 * 24));
+      layer.set_decay(4.8 / (60 * 24));
       layer.set_timeSeries(true);
       layers.value.push(layer);
     });
+    
+    
   });
 
   const showMoonRefLayer = false;
@@ -456,6 +486,21 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
   }
 
 }
+
+watch(zoomSliderValue, (z) => {
+  layers.value.forEach(layer => {
+    if (layer.get_name() !== "Artemis") {
+      return;
+    }
+    if (z > 0.7) {
+      layer.set_markerScale(MarkerScales.world);
+      layer.set_scaleFactor(0.02);
+    } else {
+      layer.set_markerScale(MarkerScales.screen);
+      layer.set_scaleFactor(10);   
+    }
+  });
+});
 
 function removeArtemisLayers() {
   console.log('remove layers');
@@ -505,7 +550,7 @@ onMounted(() => {
       const depth = WWTControl.singleton.getDepth(x, y, z);
       // @ts-expect-error this does exist
       const moonDepth = WWTControl.singleton.getDepth(0, 0, 0);
-      return depth <= moonDepth;
+      return depth <= (moonDepth + 0.0000116 / 4); // magic number minor improvement to front side depth test
     }.bind(this);
 
 
