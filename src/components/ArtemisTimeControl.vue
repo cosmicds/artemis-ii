@@ -142,7 +142,7 @@ const rates = [
   ['1 day/sec', stepMs(1)],
 ] as const;
 
-const rate = ref(rates[1][1]);
+const rate = ref(rates[2][1]);
 
 let interval: number | null = null;
 function setupInterval(stepMs: number) {
