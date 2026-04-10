@@ -1,5 +1,8 @@
 <template>
-  <div class="overlay-container">
+  <div 
+    v-if="showPreview"
+    class="overlay-container"
+  >
     <svg
       viewBox="0 0 200 200"
       width="100%"
@@ -70,8 +73,10 @@ import { ref, onMounted, onUnmounted } from 'vue';
 const labelText = ref('Pinch to Zoom');
 
 let intervalId: ReturnType<typeof setInterval>;
+const showPreview = ref(true);
 
 onMounted(() => {
+  
   const startTime = Date.now();
   intervalId = setInterval(() => {
     const ms = (Date.now() - startTime) % 6000;
@@ -79,6 +84,14 @@ onMounted(() => {
     else if (ms < 5100) labelText.value = 'Drag to Move';
     else labelText.value = '';
   }, 100);
+  console.log('mounted gesture preview');
+  // hide after a few seconds or click anywhere on screen
+  setTimeout(() => showPreview.value = false, 15000);
+  setTimeout(() => {
+    window.addEventListener('click', () => {
+      showPreview.value = false;
+    }, { once: true });
+  }, 0);
 });
 
 onUnmounted(() => {
@@ -92,9 +105,9 @@ body
 {
   width: 200px;
   height: 200px;
-  position: fixed;
-  bottom: 1rem;
-  left: 1rem;
+  pointer-events: auto;
+  position: relative;
+  align-self: flex-start;
 }
 
 /* Target animation */

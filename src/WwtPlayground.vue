@@ -133,6 +133,7 @@
         <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
         <div id="bottom-content">
+          <GesturePreview v-if="splashIsClosed" />
           <ArtemisTimeControl
             v-model:time="currentTime"
             :can-create="positionSet"
@@ -165,7 +166,6 @@
             </p>
           </div>
         </div>
-        <GesturePreview v-if="splashIsClosed" />
       </div>
     </div>
     <div
