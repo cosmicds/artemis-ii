@@ -136,6 +136,7 @@ function stepMs(daysPerSecond: number): number {
 }
 const rates = [
   ['Real time', PLAY_INTERVAL_MS],
+  ['1 hrs/sec', stepMs(1/24)],
   ['6 hrs/sec', stepMs(6/24)],
   ['12 hrs/sec', stepMs(0.5)],
   ['1 day/sec', stepMs(1)],

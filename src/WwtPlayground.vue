@@ -409,9 +409,10 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
         layer.set_astronomical(true);
         layer.set_cartesianScale(AltUnits.astronomicalUnits);
         layer.set_altUnit(AltUnits.astronomicalUnits);
-        layer.set_markerScale(MarkerScales.screen);
-        layer.set_scaleFactor(10);
+        layer.set_markerScale(MarkerScales.world);
+        layer.set_scaleFactor(.0012);
         layer.set_color(Color.fromHex("#ffffff"));
+        // layer.set_color(Color.fromHex("#c319e1"));
         layer.set_showFarSide(true);
         layer.set_opacity(25);
         layers.value.push(layer);
@@ -434,16 +435,18 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_altUnit(AltUnits.astronomicalUnits);
       layer.set_markerScale(MarkerScales.screen);
       layer.set_plotType(PlotTypes.gaussian);
-      layer.set_scaleFactor(40);
-      layer.set_color(Color.fromHex("#ff0000"));
+      layer.set_scaleFactor(35);
+      layer.set_color(Color.fromHex("#df1c23")); // artemis
       layer.set_showFarSide(true);
       layer.set_opacity(100);
       layer.set_startDateColumn(1);
       layer.set_endDateColumn(1);
-      layer.set_decay(4.99 / (60 * 24));
+      layer.set_decay(4.8 / (60 * 24));
       layer.set_timeSeries(true);
       layers.value.push(layer);
     });
+    
+    
   });
 
   const showMoonRefLayer = false;
@@ -472,6 +475,21 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
   }
 
 }
+
+// watch(zoomSliderValue, (z) => {
+//   layers.value.forEach(layer => {
+//     if (layer.get_name() !== "Artemis Time") {
+//       return;
+//     }
+//     if (z > 0.53) {
+//       layer.set_markerScale(MarkerScales.screen);
+//       layer.set_scaleFactor(32);
+//     } else {
+//       layer.set_markerScale(MarkerScales.world);
+//       layer.set_scaleFactor(0.0048);   
+//     }
+//   });
+// });
 
 function removeArtemisLayers() {
   console.log('remove layers');
