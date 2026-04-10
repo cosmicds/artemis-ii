@@ -3,7 +3,7 @@
     v-model="show"
     content-class="gesture-preview"
     color="black"
-    :timeout="600000"
+    :timeout="6000"
     location="top"
     close-on-content-click
   >
