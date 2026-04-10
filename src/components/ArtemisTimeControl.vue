@@ -28,6 +28,14 @@
     </div>
     <div class="artemis-rate">
       <!-- {{ rates[0][0] }} -->
+      <button 
+        class="now-btn" 
+        title="Now" 
+        @click="goToNow"
+      >
+        Now
+      </button>
+
       <label for="artemis-rate-selector">Speed:
         <select 
           id="artemis-rate-selector"
@@ -71,6 +79,14 @@ function applyTime(date: Date) {
 
 function onSliderInput(e: Event) {
   applyTime(new Date(parseInt((e.target as HTMLInputElement).value)));
+}
+
+function goToNow() {
+  play.value = false;
+  const nowMs = Date.now();
+  const roundedMs = Math.round(nowMs / STEP_MS) * STEP_MS;
+  const clampedMs = Math.min(Math.max(roundedMs, MISSION_START.getTime()), MISSION_END.getTime());
+  applyTime(new Date(clampedMs));
 }
 
 
@@ -119,6 +135,7 @@ function stepMs(daysPerSecond: number): number {
   return realStep;
 }
 const rates = [
+  ['Real time', PLAY_INTERVAL_MS],
   ['6 hrs/sec', stepMs(6/24)],
   ['12 hrs/sec', stepMs(0.5)],
   ['1 day/sec', stepMs(1)],
@@ -226,6 +243,21 @@ watch(play, (isPlaying) => {
   pointer-events: auto;
   color: #fff;
   font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.now-btn {
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  cursor: pointer;
+  user-select: none;
+  &:hover { background: rgba(255, 255, 255, 0.25); }
 }
 .artemis-rate label {
   user-select: none;
