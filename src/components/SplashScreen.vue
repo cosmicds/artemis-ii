@@ -73,7 +73,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { FocusTrap } from "focus-trap-vue";
-import SplashGesture from './SplashGesture.vue';
 
 export interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

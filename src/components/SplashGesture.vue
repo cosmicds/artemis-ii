@@ -8,7 +8,7 @@
     close-on-content-click
   >
     <template #text>
-      <div class="gesture-preview-container my-2">
+      <div :class="['gesture-preview-container', smallScreen ? 'my-1 small' : 'my-2']">
         <div class="gesture-icon">
           <div class="gesture-icon__icon">
             <v-icon
@@ -45,7 +45,10 @@
         <span class="gesture-explore">to explore</span>
       </div>
     </template>
-    <template #actions>
+    <template
+      v-if="!smallScreen"
+      #actions
+    >
       <v-btn
         class="mx-2"
         density="comfortable"
@@ -62,7 +65,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useDisplay } from 'vuetify';
 const show = ref(true);
+const smallScreen = useDisplay().smAndDown;
 
 const hide = () => show.value = false;
 
@@ -97,8 +102,12 @@ onUnmounted(() => {
   justify-content: space-between;
   width: fit-content;
   gap: 2em;
-  
   font-size: 1.25em;
+}
+
+.gesture-preview-container.small {
+  gap: 1.5em;
+  font-size: 1.2em;
 }
 
 .gesture-icon {
