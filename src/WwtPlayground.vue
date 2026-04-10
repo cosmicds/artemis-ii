@@ -62,7 +62,13 @@
               @activate="() => showInfoSheet = !showInfoSheet"
             >
             </icon-button>
-            <span class="zoom-label">+</span>
+            <button 
+              class="artemis-btn zoom-label"
+              @click="zoomIn"
+              @keyup.enter="zoomIn"
+            >
+              +
+            </button>
             <input
               type="range"
               class="zoom-slider"
@@ -73,7 +79,13 @@
               :value="zoomSliderValue"
               @input="onZoomSlider"
             />
-            <span class="zoom-label">−</span>
+            <button 
+              class="artemis-btn zoom-label"
+              @click="zoomOut"
+              @keyup.enter="zoomOut"
+            >
+              −
+            </button>
           </div>
           <div id="center-buttons">
           </div>
@@ -219,7 +231,34 @@ function fovToSlider(fov: number): number {
 function sliderToFov(t: number): number {
   return Math.exp(LOG_MIN + stretchSlider(t) * (LOG_MAX - LOG_MIN));
 }
-// watchWwtContainerSize('.wwtelescope-component', '#main-content');
+
+const zoomSliderValue = computed(() => fovToSlider(store.zoomDeg));
+
+function onZoomSlider(e: Event) {
+  const fov = sliderToFov(+(e.target as HTMLInputElement).value);
+  const rc = WWTControl.singleton.renderContext;
+  rc.targetCamera.zoom = fov;
+  rc.viewCamera.zoom   = fov;
+  WWTControl.singleton.renderOneFrame();
+}
+
+function zoomIn() {
+  const newZoom = store.zoomDeg / 1.25;
+  const clampedZoom = Math.max(newZoom, ZOOM_MIN);
+  const rc = WWTControl.singleton.renderContext;
+  rc.targetCamera.zoom = clampedZoom;
+  rc.viewCamera.zoom   = clampedZoom;
+  WWTControl.singleton.renderOneFrame();
+}
+
+function zoomOut() {
+  const newZoom = store.zoomDeg * 1.25;
+  const clampedZoom = Math.min(newZoom, ZOOM_MAX);
+  const rc = WWTControl.singleton.renderContext;
+  rc.targetCamera.zoom = clampedZoom;
+  rc.viewCamera.zoom   = clampedZoom;
+  WWTControl.singleton.renderOneFrame();
+}
 
 type SheetType = "text" | "video";
 
@@ -302,16 +341,6 @@ const EARTH_VIEW: CameraView = {
 //   time: HOME_TIME.getTime()
 // };
 
-
-const zoomSliderValue = computed(() => fovToSlider(store.zoomDeg));
-
-function onZoomSlider(e: Event) {
-  const fov = sliderToFov(+(e.target as HTMLInputElement).value);
-  const rc = WWTControl.singleton.renderContext;
-  rc.targetCamera.zoom = fov;
-  rc.viewCamera.zoom   = fov;
-  WWTControl.singleton.renderOneFrame();
-}
 
 const currentTime = ref(INITIAL_TIME.value);
 
