@@ -409,8 +409,9 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
         layer.set_astronomical(true);
         layer.set_cartesianScale(AltUnits.astronomicalUnits);
         layer.set_altUnit(AltUnits.astronomicalUnits);
-        layer.set_markerScale(MarkerScales.world);
-        layer.set_scaleFactor(.0012);
+        layer.set_markerScale(MarkerScales.screen);
+        // layer.set_scaleFactor(.0012);
+        layer.set_scaleFactor(12);
         layer.set_color(Color.fromHex("#ffffff"));
         // layer.set_color(Color.fromHex("#c319e1"));
         layer.set_showFarSide(true);
@@ -435,7 +436,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_altUnit(AltUnits.astronomicalUnits);
       layer.set_markerScale(MarkerScales.screen);
       layer.set_plotType(PlotTypes.gaussian);
-      layer.set_scaleFactor(35);
+      layer.set_scaleFactor(40);
       layer.set_color(Color.fromHex("#df1c23")); // artemis
       layer.set_showFarSide(true);
       layer.set_opacity(100);
@@ -476,20 +477,21 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
 
 }
 
-// watch(zoomSliderValue, (z) => {
-//   layers.value.forEach(layer => {
-//     if (layer.get_name() !== "Artemis Time") {
-//       return;
-//     }
-//     if (z > 0.53) {
-//       layer.set_markerScale(MarkerScales.screen);
-//       layer.set_scaleFactor(32);
-//     } else {
-//       layer.set_markerScale(MarkerScales.world);
-//       layer.set_scaleFactor(0.0048);   
-//     }
-//   });
-// });
+watch(zoomSliderValue, (z) => {
+  console.log("zoom slider", z);
+  layers.value.forEach(layer => {
+    if (layer.get_name() !== "Artemis") {
+      return;
+    }
+    if (z > 0.7) {
+      layer.set_markerScale(MarkerScales.world);
+      layer.set_scaleFactor(0.02);
+    } else {
+      layer.set_markerScale(MarkerScales.screen);
+      layer.set_scaleFactor(12);   
+    }
+  });
+});
 
 function removeArtemisLayers() {
   console.log('remove layers');
