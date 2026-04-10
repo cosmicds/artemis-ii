@@ -30,12 +30,12 @@
               <v-icon
                 size="small"
               >
-                mdi-magnify-minus
+                mdi-minus-box-outline
               </v-icon>
               <v-icon
                 size="small"
               >
-                mdi-magnify-plus
+                mdi-plus-box-outline
               </v-icon>
             </div>
           </div>
@@ -143,5 +143,6 @@ onUnmounted(() => {
 .two-icons {
   display: flex;
   flex-direction: row;
+  gap: 4px;
 }
 </style>
