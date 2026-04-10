@@ -89,6 +89,7 @@ onUnmounted(() => {
 .gesture-preview {
   border: 1px solid white;
   margin-top: 1em;
+  padding-left: 0.5em;
 }
 .gesture-preview.small {
   padding-inline: 1em;
