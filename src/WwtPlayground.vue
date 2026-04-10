@@ -388,7 +388,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
   const N = 10;
   const centerStart = 1300;
   const centerEnd = 1500;
-  const end = 2600;
+  const end = items.length;
   for (let i = centerStart; i < centerEnd; i += N) {
     bounds.push([i, i + N]);
   }
@@ -410,7 +410,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
         layer.set_cartesianScale(AltUnits.astronomicalUnits);
         layer.set_altUnit(AltUnits.astronomicalUnits);
         layer.set_markerScale(MarkerScales.screen);
-        layer.set_scaleFactor(5);
+        layer.set_scaleFactor(10);
         layer.set_color(Color.fromHex("#ffffff"));
         layer.set_showFarSide(true);
         layer.set_opacity(25);
@@ -434,7 +434,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_altUnit(AltUnits.astronomicalUnits);
       layer.set_markerScale(MarkerScales.screen);
       layer.set_plotType(PlotTypes.gaussian);
-      layer.set_scaleFactor(30);
+      layer.set_scaleFactor(40);
       layer.set_color(Color.fromHex("#ff0000"));
       layer.set_showFarSide(true);
       layer.set_opacity(100);
