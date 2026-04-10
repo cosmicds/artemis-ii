@@ -136,7 +136,9 @@
               <p class="location">
                 <span>Artemis II Location</span>
               </p>
-              <p>Artemis II Path</p>
+              <p class="path">
+                <span>Artemis II Path</span>
+              </p>
             </div>
           </div>
         </div>
@@ -159,7 +161,9 @@
             <p class="location">
               <span>Location</span>
             </p>
-            <p>Path</p>
+            <p class="path">
+              <span>Path</span>
+            </p>
           </div>
           <div
             v-if="!smallSize"
@@ -308,10 +312,11 @@ const VIDEO_URL = "https://www.youtube.com/embed/ML9y0Z7A8ec?autoplay=1&mute=1";
 const urlTime = new URLSearchParams(window.location.search).get("time");
 const HOME_TIME = new Date("2026-04-06T22:32:00Z");
 const INITIAL_TIME = ref(urlTime ? new Date(+urlTime) : HOME_TIME);
+// ?lng=214.660687&lat=13.418963&fov=0.000511&rot=0.000000&angle=0.000000&time=1775514752592
 const INITIAL_VIEW: CameraView = {
-  lng: 167.630072,
-  lat: -0.567000,
-  zoomDeg: 0.000230,
+  lng: 214.660687,
+  lat: 13.418963,
+  zoomDeg: 0.000511,
   rotationDeg: 0,
   angleDeg: 0,
   time: INITIAL_TIME.value.getTime()
@@ -382,6 +387,10 @@ const showTrajectory = ref(true);
 import { OrbitLineList, Vector3d } from "@wwtelescope/engine";
 function createArtemisOrbitLineList(trackedObject: SolarSystemObjects) {
   const lineList = new OrbitLineList();
+  const colorHex = "#ffffff";
+  const color = Color.fromHex(colorHex);
+  console.log(Color);
+  color.a = 255;
   const vec = loadHorizonsVectorsForWwt('./horizons_results-earth.txt', SolarSystemObjects.earth, trackedObject).then(vec => {
     const items = vec.split("\r\n");
     const header = items.shift();
@@ -397,11 +406,12 @@ function createArtemisOrbitLineList(trackedObject: SolarSystemObjects) {
       lineList.addLine(
         points[i - 1], 
         points[i], 
-        Color.fromHex("#ffffff"), 
-        Color.fromHex("#ffffff")
+        color,
+        color,
       );
     }
   });
+  console.log(lineList);
   return lineList;
 }
 
@@ -425,30 +435,28 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
   bounds.forEach((bds) => {
     const data = items.slice(...bds).join("\r\n");
 
-    // eslint-disable-next-line no-constant-condition
-    if (false) {
-      store.createTableLayer({
-        name: 'Artemis',
-        referenceFrame: 'Sky',
-        dataCsv: `${header}\r\n${data}`,
-      }).then(layer => {
-        layer.set_xAxisColumn(2);
-        layer.set_yAxisColumn(3);
-        layer.set_zAxisColumn(4);
-        layer.set_coordinatesType(CoordinatesType.rectangular);
-        layer.set_astronomical(true);
-        layer.set_cartesianScale(AltUnits.astronomicalUnits);
-        layer.set_altUnit(AltUnits.astronomicalUnits);
-        layer.set_markerScale(MarkerScales.screen);
-        // layer.set_scaleFactor(.0012);
-        layer.set_scaleFactor(12);
-        layer.set_color(Color.fromHex("#ffffff"));
-        // layer.set_color(Color.fromHex("#c319e1"));
-        layer.set_showFarSide(true);
-        layer.set_opacity(25);
-        layers.value.push(layer);
-      });
-    }
+    // if (showTrajectory.value) {
+    //   store.createTableLayer({
+    //     name: 'Artemis',
+    //     referenceFrame: 'Sky',
+    //     dataCsv: `${header}\r\n${data}`,
+    //   }).then(layer => {
+    //     layer.set_xAxisColumn(2);
+    //     layer.set_yAxisColumn(3);
+    //     layer.set_zAxisColumn(4);
+    //     layer.set_coordinatesType(CoordinatesType.rectangular);
+    //     layer.set_astronomical(true);
+    //     layer.set_cartesianScale(AltUnits.astronomicalUnits);
+    //     layer.set_altUnit(AltUnits.astronomicalUnits);
+    //     layer.set_markerScale(MarkerScales.screen);
+    //     // layer.set_scaleFactor(.0012);
+    //     layer.set_scaleFactor(10);
+    //     layer.set_color(Color.fromHex("#ffffff"));
+    //     layer.set_showFarSide(true);
+    //     layer.set_opacity(25);
+    //     layers.value.push(layer);
+    //   });
+    // }
 
 
 
@@ -507,20 +515,20 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
 
 }
 
-watch(zoomSliderValue, (z) => {
-  layers.value.forEach(layer => {
-    if (layer.get_name() !== "Artemis") {
-      return;
-    }
-    if (z > 0.7) {
-      layer.set_markerScale(MarkerScales.world);
-      layer.set_scaleFactor(0.02);
-    } else {
-      layer.set_markerScale(MarkerScales.screen);
-      layer.set_scaleFactor(10);   
-    }
-  });
-});
+// watch(zoomSliderValue, (z) => {
+//   layers.value.forEach(layer => {
+//     if (layer.get_name() !== "Artemis") {
+//       return;
+//     }
+//     if (z > 0.7) {
+//       layer.set_markerScale(MarkerScales.world);
+//       layer.set_scaleFactor(0.02);
+//     } else {
+//       layer.set_markerScale(MarkerScales.screen);
+//       layer.set_scaleFactor(10);   
+//     }
+//   });
+// });
 
 function removeArtemisLayers() {
   console.log('remove layers');
@@ -972,7 +980,11 @@ and remember, position:absolute is still a positioned parent, so children can be
 .legend > p.location {
   color: red;
 }
-.legend > p.location > span {
+
+.legend > p.path {
+  color: white;
+}
+.legend > p > span {
   color: white;
 }
 
