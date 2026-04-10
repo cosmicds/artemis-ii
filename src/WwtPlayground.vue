@@ -122,9 +122,9 @@
               class="legend"
             >
               <p class="location">
-                <span>Artemis II location</span>
+                <span>Artemis II Location</span>
               </p>
-              <p>Artemis II trajectory</p>
+              <p>Artemis II Path</p>
             </div>
           </div>
         </div>
@@ -147,7 +147,7 @@
             <p class="location">
               <span>Location</span>
             </p>
-            <p>Trajectory</p>
+            <p>Path</p>
           </div>
           <div
             v-if="!smallSize"
