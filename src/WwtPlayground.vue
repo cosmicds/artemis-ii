@@ -436,7 +436,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_altUnit(AltUnits.astronomicalUnits);
       layer.set_markerScale(MarkerScales.screen);
       layer.set_plotType(PlotTypes.gaussian);
-      layer.set_scaleFactor(40);
+      layer.set_scaleFactor(30);
       layer.set_color(Color.fromHex("#df1c23")); // artemis
       layer.set_showFarSide(true);
       layer.set_opacity(100);
@@ -478,7 +478,6 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
 }
 
 watch(zoomSliderValue, (z) => {
-  console.log("zoom slider", z);
   layers.value.forEach(layer => {
     if (layer.get_name() !== "Artemis") {
       return;
@@ -488,7 +487,7 @@ watch(zoomSliderValue, (z) => {
       layer.set_scaleFactor(0.02);
     } else {
       layer.set_markerScale(MarkerScales.screen);
-      layer.set_scaleFactor(12);   
+      layer.set_scaleFactor(10);   
     }
   });
 });
