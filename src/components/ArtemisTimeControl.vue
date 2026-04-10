@@ -91,9 +91,10 @@ function goToNow() {
 
 
 
-
-const MISSION_START = new Date("2026-04-02T01:58:32Z");
-const MISSION_END   = new Date("2026-04-10T23:54:30Z");
+// 2026-Apr-02 01:59:00.0000
+const MISSION_START = new Date("2026-04-02T01:59:00Z");
+// 2026-Apr-10 23:54:00.0000
+const MISSION_END   = new Date("2026-04-10T23:54:00Z");
 const STEP_MS       = 5 * 60 * 1000;
 
 const INITIAL_TIME = props.initialTime; //new Date("2026-04-06T22:32:00Z");
@@ -149,8 +150,11 @@ function setupInterval(stepMs: number) {
   if (play.value) {
     interval = setInterval(() => {
       const newTime = new Date(currentTime.value.getTime() + stepMs);
-      if (newTime > MISSION_END) {
-        applyTime(MISSION_START);
+      if (newTime >= MISSION_END) {
+        play.value = false;
+        setTimeout(() => {
+          applyTime(MISSION_START);
+        }, 750);
         return;
       }
       applyTime(newTime);

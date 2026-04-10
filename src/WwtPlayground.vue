@@ -323,9 +323,10 @@ const buttonColor = ref("#ffffff");
 const VIDEO_URL = "https://www.youtube.com/embed/ML9y0Z7A8ec?autoplay=1&mute=1";
 
 
-// const HOME_TIME = new Date("2026-04-06T22:32:00Z");
-const MISSION_START = new Date("2026-04-02T01:58:32Z");
-const MISSION_END   = new Date("2026-04-10T23:54:30Z");
+// 2026-Apr-02 01:59:00.0000
+const MISSION_START = new Date("2026-04-02T01:59:00Z");
+// 2026-Apr-10 23:54:00.0000
+const MISSION_END   = new Date("2026-04-10T23:54:00Z");
 // HOME_TIME shoul be clamped as now between START and END
 const now = new Date();
 const HOME_TIME = new Date(Math.min(Math.max(now.getTime(), MISSION_START.getTime()), MISSION_END.getTime()));
@@ -499,7 +500,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_opacity(100);
       layer.set_startDateColumn(1);
       layer.set_endDateColumn(1);
-      layer.set_decay(4.8 / (60 * 24));
+      layer.set_decay(4.9 / (60 * 24));
       layer.set_timeSeries(true);
       layers.value.push(layer);
     });
