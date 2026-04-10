@@ -530,7 +530,7 @@ onMounted(() => {
       const depth = WWTControl.singleton.getDepth(x, y, z);
       // @ts-expect-error this does exist
       const moonDepth = WWTControl.singleton.getDepth(0, 0, 0);
-      return depth <= moonDepth;
+      return depth <= (moonDepth + 0.0000116 / 4); // magic number minor improvement to front side depth test
     }.bind(this);
 
 
