@@ -164,6 +164,7 @@
             </p>
           </div>
         </div>
+        <GesturePreview />
       </div>
     </div>
     <div
@@ -190,6 +191,7 @@ import { AstroCalc, Color, SpreadSheetLayer } from "@wwtelescope/engine";
 import { CoordinatesType, MarkerScales, PlotTypes, ReferenceFrames, SolarSystemObjects } from "@wwtelescope/engine-types";
 import ArtemisTimeControl from "./components/ArtemisTimeControl.vue";
 import VideoWrapper from "./components/VideoWrapper.vue";
+import GesturePreview from "./components/GesturePreview.vue";
 
 import { useCameraUrl } from "./composables/useCameraUrl";
 import { moveViewCamera, layerManagerDraw, getDepth, getCoordinatesForScreenPoint,getScreenPointForCoordinates, transformPickPointToWorldSpace, transformWorldPointToPickSpace, renderOneFrame, makeFrustum, type CameraView } from "./wwt-hacks";
