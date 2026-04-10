@@ -15,6 +15,7 @@
 
       <!-- This contains the splash screen content -->
       <SplashScreen
+        v-if="showSplashScreen"
         :color="accentColor"
         highlight-color="red"
         :loaded="!isLoading"
@@ -148,7 +149,7 @@
 
         <div id="bottom-content">
           <!-- <GesturePreview /> -->
-          <SplashGesture v-if="splashIsClosed" />
+          <SplashGesture v-if="splashIsClosed && !isLoading" />
           <ArtemisTimeControl
             v-model:time="currentTime"
             :can-create="positionSet"
@@ -195,6 +196,9 @@
         :text-color="accentColor"
       />
     </div>
+    <WebGlTest 
+      @webgl2-disabled="webglDisabled = true"
+    />
   </v-app>
 </template>
 
@@ -215,6 +219,14 @@ import SplashGesture from "./components/SplashGesture.vue";
 import { useCameraUrl } from "./composables/useCameraUrl";
 import { moveViewCamera, layerManagerDraw, getDepth, getCoordinatesForScreenPoint,getScreenPointForCoordinates, transformPickPointToWorldSpace, transformWorldPointToPickSpace, renderOneFrame, makeFrustum, type CameraView } from "./wwt-hacks";
 import { LayerManager, WWTControl } from "@wwtelescope/engine";
+import { AltUnits } from "@wwtelescope/engine-types";
+
+import { loadHorizonsVectorsForWwt } from "./horizons";
+import SplashScreen from "./components/SplashScreen.vue";
+import InformationSheet from "./components/InformationSheet.vue";
+
+import WebGlTest from "./components/WebGlTest.vue";
+const webglDisabled = ref(false);
 
 const ZOOM_MIN   = 0.00006;
 const ZOOM_MAX   = 240;
@@ -301,6 +313,7 @@ const props = withDefaults(defineProps<WwtPlaygroundProps>(), {
 
 const backgroundImagesets = reactive<BackgroundImageset[]>([]);
 const showInfoSheet = ref(false);
+const showSplashScreen = ref(true);
 const splashIsClosed = ref(false);
 const showVideo = ref(false);
 const layersLoaded = ref(false);
@@ -368,15 +381,12 @@ function doWWTHacks() {
   LayerManager._draw = layerManagerDraw;
 }
 
-import { AltUnits } from "@wwtelescope/engine-types";
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 let copyViewUrl: () => Promise<void> = async () => {};
 const copySuccess = ref(false);
 
 
-import { loadHorizonsVectorsForWwt } from "./horizons";
-import SplashScreen from "./components/SplashScreen.vue";
-import InformationSheet from "./components/InformationSheet.vue";
 const layers = ref<SpreadSheetLayer[]>([]);
 
 const trackingCenter = ref<SolarSystemObjects>(SolarSystemObjects.moon);
@@ -554,6 +564,17 @@ function drawArtemisOrbit () {
 
 
 onMounted(() => {
+  
+  if (webglDisabled.value) {
+    showSplashScreen.value = false;
+    // eslint-disable-next-lint @typescript-eslint/ban-ts-comment
+    // @ts-expect-error `canvas` is defined
+    WWTControl.singleton.canvas.setAttribute("hidden", "true");
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    WWTControl.singleton.renderOneFrame = function() {};
+    return;
+  }
+
   store.waitForReady().then(async () => {
     WWTControl.singleton.set_zoomMax(ZOOM_MAX);
     WWTControl.singleton.setSolarSystemMaxZoom(ZOOM_MAX);
