@@ -378,6 +378,35 @@ const trackingCenter = ref<SolarSystemObjects>(SolarSystemObjects.moon);
 
 const showTrajectory = ref(true);
 
+
+import { OrbitLineList, Vector3d } from "@wwtelescope/engine";
+function createArtemisOrbitLineList(trackedObject: SolarSystemObjects) {
+  const lineList = new OrbitLineList();
+  const vec = loadHorizonsVectorsForWwt('./horizons_results-earth.txt', SolarSystemObjects.earth, trackedObject).then(vec => {
+    const items = vec.split("\r\n");
+    const header = items.shift();
+    const points = items.map(line => {
+      const parts = line.split(",");
+      return Vector3d.create(
+        +parts[2],
+        +parts[4],
+        +parts[3]
+      );
+    });
+    for (let i = 1; i < points.length; i++) {
+      lineList.addLine(
+        points[i - 1], 
+        points[i], 
+        Color.fromHex("#ffffff"), 
+        Color.fromHex("#ffffff")
+      );
+    }
+  });
+  return lineList;
+}
+
+
+
 async function createArtemisLayers(trackedObject: SolarSystemObjects) {
 
   const vec = await loadHorizonsVectorsForWwt('./horizons_results-earth.txt', SolarSystemObjects.earth, trackedObject);
@@ -385,7 +414,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
   const header = items.shift();
   let bounds: [number, number][] = [];
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const N = 10;
+  const N = 2;
   const centerStart = 1300;
   const centerEnd = 1500;
   const end = items.length;
@@ -396,7 +425,8 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
   bounds.forEach((bds) => {
     const data = items.slice(...bds).join("\r\n");
 
-    if (showTrajectory.value) {
+    // eslint-disable-next-line no-constant-condition
+    if (!showTrajectory.value) {
       store.createTableLayer({
         name: 'Artemis',
         referenceFrame: 'Sky',
@@ -500,6 +530,21 @@ function removeArtemisLayers() {
 
 const showSkyBackground = ref(true);
 
+
+import { addToWWTRenderLoop, removeFromWWTRenderLoop } from "./wwt-hacks";
+const artemisOrbitLineList = ref(createArtemisOrbitLineList(trackingCenter.value));
+
+function setArtemisLineList() {
+  artemisOrbitLineList.value = createArtemisOrbitLineList(trackingCenter.value);
+}
+function drawArtemisOrbit () {
+  if (showTrajectory.value) {
+    artemisOrbitLineList.value.set_depthBuffered(true);
+    artemisOrbitLineList.value.drawLines(WWTControl.singleton.renderContext, 1, Color.fromHex("#ffffff"));
+  }
+}
+
+
 onMounted(() => {
   store.waitForReady().then(async () => {
     WWTControl.singleton.set_zoomMax(ZOOM_MAX);
@@ -514,6 +559,10 @@ onMounted(() => {
     store.applySetting(["solarSystemMilkyWay", showSkyBackground.value]);
     store.applySetting(["solarSystemStars", showSkyBackground.value]);
     store.setTrackedObject(SolarSystemObjects.moon);
+    
+    addToWWTRenderLoop(() => {
+      drawArtemisOrbit();
+    });
 
     // @ts-expect-error this does exist
     WWTControl.singleton.shallowLayerTest = function(layer) {
@@ -529,7 +578,7 @@ onMounted(() => {
       const depth = WWTControl.singleton.getDepth(x, y, z);
       // @ts-expect-error this does exist
       const moonDepth = WWTControl.singleton.getDepth(0, 0, 0);
-      return depth <= (moonDepth + 0.0000116 / 4); // magic number minor improvement to front side depth test
+      return depth <= (moonDepth + 0.0000116 / 6); // magic number minor improvement to front side depth test
     }.bind(this);
 
 
@@ -559,11 +608,17 @@ watch(trackingCenter, (trackedObject) => {
     moveViewCamera(EARTH_VIEW, false);
   }
   createArtemisLayers(trackedObject);
+  removeFromWWTRenderLoop(drawArtemisOrbit);
+  setArtemisLineList();
+  addToWWTRenderLoop(drawArtemisOrbit);
 });
 
 watch(showTrajectory, (show) => {
   removeArtemisLayers();
   createArtemisLayers(trackingCenter.value);
+  removeFromWWTRenderLoop(drawArtemisOrbit);
+  setArtemisLineList();
+  addToWWTRenderLoop(drawArtemisOrbit);
 });
 
 const ready = computed(() => layersLoaded.value && positionSet.value);
