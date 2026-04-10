@@ -18,6 +18,7 @@
         :color="accentColor"
         highlight-color="red"
         :loaded="!isLoading"
+        @close="() => splashIsClosed = true"
       />
       <VideoWrapper
         v-model="showVideo"
@@ -164,7 +165,7 @@
             </p>
           </div>
         </div>
-        <GesturePreview />
+        <GesturePreview v-if="splashIsClosed" />
       </div>
     </div>
     <div
@@ -219,6 +220,7 @@ function sliderToFov(t: number): number {
 // watchWwtContainerSize('.wwtelescope-component', '#main-content');
 
 type SheetType = "text" | "video";
+
 type CameraParams = Omit<GotoRADecZoomParams, "instant">;
 export interface WwtPlaygroundProps {
   wwtNamespace?: string;
@@ -254,6 +256,7 @@ const props = withDefaults(defineProps<WwtPlaygroundProps>(), {
 
 const backgroundImagesets = reactive<BackgroundImageset[]>([]);
 const showInfoSheet = ref(false);
+const splashIsClosed = ref(false);
 const showVideo = ref(false);
 const layersLoaded = ref(false);
 const positionSet = ref(false);
