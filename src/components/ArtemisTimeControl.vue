@@ -245,6 +245,7 @@ watch(play, (isPlaying) => {
   font-size: 0.8rem;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
 }
 .now-btn {
