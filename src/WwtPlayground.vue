@@ -322,8 +322,17 @@ const accentColor = ref("#ffa000");
 const buttonColor = ref("#ffffff");
 const VIDEO_URL = "https://www.youtube.com/embed/ML9y0Z7A8ec?autoplay=1&mute=1";
 
+
+// const HOME_TIME = new Date("2026-04-06T22:32:00Z");
+const MISSION_START = new Date("2026-04-02T01:58:32Z");
+const MISSION_END   = new Date("2026-04-10T23:54:30Z");
+// HOME_TIME shoul be clamped as now between START and END
+const now = new Date();
+const HOME_TIME = new Date(Math.min(Math.max(now.getTime(), MISSION_START.getTime()), MISSION_END.getTime()));
 const urlTime = new URLSearchParams(window.location.search).get("time");
-const HOME_TIME = new Date("2026-04-06T22:32:00Z");
+
+
+
 const INITIAL_TIME = ref(urlTime ? new Date(+urlTime) : HOME_TIME);
 // ?lng=214.660687&lat=13.418963&fov=0.000511&rot=0.000000&angle=0.000000&time=1775514752592
 const INITIAL_VIEW: CameraView = {
