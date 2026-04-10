@@ -309,12 +309,9 @@ const urlTime = new URLSearchParams(window.location.search).get("time");
 const HOME_TIME = new Date("2026-04-06T22:32:00Z");
 const INITIAL_TIME = ref(urlTime ? new Date(+urlTime) : HOME_TIME);
 const INITIAL_VIEW: CameraView = {
-  // lng: 169.906038,
-  lng: 168.007573,
-  // lat: 1.323000,
-  lat: 3.591000,
-  // zoomDeg: 0.000163,
-  zoomDeg: 0.000157,
+  lng: 167.630072,
+  lat: -0.567000,
+  zoomDeg: 0.000230,
   rotationDeg: 0,
   angleDeg: 0,
   time: INITIAL_TIME.value.getTime()
