@@ -25,7 +25,7 @@
         ZOOM
       </div>
     </div>
-    to move around
+    <span class="gesture-explore">to explore the path</span>
   </div>
 </template>
 
@@ -68,5 +68,9 @@ const touchscreen = supportsTouchscreen();
 
 .gesture-and {
   font-size: 1.5rem;
+}
+
+.gesture-explore {
+  width: 5rem
 }
 </style>
