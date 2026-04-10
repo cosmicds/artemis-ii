@@ -180,6 +180,9 @@
         :text-color="accentColor"
       />
     </div>
+    <WebGlTest 
+      @webgl2-disabled="webglDisabled = true"
+    />
   </v-app>
 </template>
 
@@ -206,6 +209,8 @@ import { loadHorizonsVectorsForWwt } from "./horizons";
 import SplashScreen from "./components/SplashScreen.vue";
 import InformationSheet from "./components/InformationSheet.vue";
 
+import WebGlTest from "./components/WebGlTest.vue";
+const webglDisabled = ref(false);
 
 const ZOOM_MIN   = 0.00006;
 const ZOOM_MAX   = 240;
@@ -461,6 +466,17 @@ function removeArtemisLayers() {
 const showSkyBackground = ref(true);
 
 onMounted(() => {
+  
+  if (webglDisabled.value) {
+    showSplashScreen.value = false;
+    // eslint-disable-next-lint @typescript-eslint/ban-ts-comment
+    // @ts-expect-error `canvas` is defined
+    WWTControl.singleton.canvas.setAttribute("hidden", "true");
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    WWTControl.singleton.renderOneFrame = function() {};
+    return;
+  }
+
   store.waitForReady().then(async () => {
     WWTControl.singleton.set_zoomMax(ZOOM_MAX);
     WWTControl.singleton.setSolarSystemMaxZoom(ZOOM_MAX);
