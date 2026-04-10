@@ -86,11 +86,10 @@ onMounted(() => {
   }, 100);
   console.log('mounted gesture preview');
   // hide after a few seconds or click anywhere on screen
-  setTimeout(() => showPreview.value = false, 6000);
+  setTimeout(() => showPreview.value = false, 18000);
   setTimeout(() => {
-    window.addEventListener('click', () => {
-      showPreview.value = false;
-    }, { once: true });
+    const hide = () => showPreview.value = false;
+    window.addEventListener('pointerup', hide, { once: true });
   }, 0);
 });
 
