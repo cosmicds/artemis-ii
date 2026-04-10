@@ -37,7 +37,9 @@
             </p>
           </div>
         </div>
-
+        
+        <!-- <SplashGesture /> -->
+        
         <div>
           <v-btn
             class="splash-get-started"
@@ -100,6 +102,7 @@ const showSplashScreen = defineModel<boolean>({ default: true });
 const splash = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
 if (!splash) {
   showSplashScreen.value = false;
+  emits('close');
 }
 
 

@@ -104,7 +104,7 @@
             <ul class="ml-5">
               <li>Data is a JPL Horizons Vector Table for Artemis II, centered on the Earth (Geocentric [code: 500]). </li>
               <li class="li">
-                Data is current as of Apr 09, 2026 07:45 UTC 
+                Data is current as of Apr 10, 2026 06:19 UTC 
                 <details>
                   <summary>Horizons Query</summary>
                   <!-- do not intent inside pre tag  -->

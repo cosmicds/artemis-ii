@@ -18,6 +18,7 @@
         :color="accentColor"
         highlight-color="red"
         :loaded="!isLoading"
+        @close="() => splashIsClosed = true"
       />
       <VideoWrapper
         v-model="showVideo"
@@ -121,9 +122,9 @@
               class="legend"
             >
               <p class="location">
-                <span>Artemis II location</span>
+                <span>Artemis II Location</span>
               </p>
-              <p>Artemis II trajectory</p>
+              <p>Artemis II Path</p>
             </div>
           </div>
         </div>
@@ -132,6 +133,8 @@
         <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
         <div id="bottom-content">
+          <!-- <GesturePreview /> -->
+          <SplashGesture v-if="splashIsClosed" />
           <ArtemisTimeControl
             v-model:time="currentTime"
             :can-create="positionSet"
@@ -144,7 +147,7 @@
             <p class="location">
               <span>Location</span>
             </p>
-            <p>Trajectory</p>
+            <p>Path</p>
           </div>
           <div
             v-if="!smallSize"
@@ -190,6 +193,8 @@ import { AstroCalc, Color, SpreadSheetLayer } from "@wwtelescope/engine";
 import { CoordinatesType, MarkerScales, PlotTypes, ReferenceFrames, SolarSystemObjects } from "@wwtelescope/engine-types";
 import ArtemisTimeControl from "./components/ArtemisTimeControl.vue";
 import VideoWrapper from "./components/VideoWrapper.vue";
+import GesturePreview from "./components/GesturePreview.vue";
+import SplashGesture from "./components/SplashGesture.vue";
 
 import { useCameraUrl } from "./composables/useCameraUrl";
 import { moveViewCamera, layerManagerDraw, getDepth, getCoordinatesForScreenPoint,getScreenPointForCoordinates, transformPickPointToWorldSpace, transformWorldPointToPickSpace, renderOneFrame, makeFrustum, type CameraView } from "./wwt-hacks";
@@ -217,6 +222,7 @@ function sliderToFov(t: number): number {
 // watchWwtContainerSize('.wwtelescope-component', '#main-content');
 
 type SheetType = "text" | "video";
+
 type CameraParams = Omit<GotoRADecZoomParams, "instant">;
 export interface WwtPlaygroundProps {
   wwtNamespace?: string;
@@ -252,6 +258,7 @@ const props = withDefaults(defineProps<WwtPlaygroundProps>(), {
 
 const backgroundImagesets = reactive<BackgroundImageset[]>([]);
 const showInfoSheet = ref(false);
+const splashIsClosed = ref(false);
 const showVideo = ref(false);
 const layersLoaded = ref(false);
 const positionSet = ref(false);
