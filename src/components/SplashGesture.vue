@@ -1,11 +1,12 @@
 <template>
   <v-snackbar
     v-model="show"
-    content-class="gesture-preview"
+    :content-class="['gesture-preview', smallScreen ? 'small' : '']"
     color="black"
-    :timeout="6000"
+    :timeout="6000000"
     location="top"
     close-on-content-click
+    :min-width="0"
   >
     <template #text>
       <div :class="['gesture-preview-container', smallScreen ? 'my-1 small' : 'my-2']">
@@ -87,6 +88,10 @@ onUnmounted(() => {
 
 .gesture-preview {
   border: 1px solid white;
+}
+.gesture-preview.small {
+  padding-inline: 1em;
+  padding-top: 0.25em;
 }
 .gesture-preview .v-snackbar__content {
   display: flex;
