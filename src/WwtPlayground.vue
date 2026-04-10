@@ -426,7 +426,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
     const data = items.slice(...bds).join("\r\n");
 
     // eslint-disable-next-line no-constant-condition
-    if (!showTrajectory.value) {
+    if (false) {
       store.createTableLayer({
         name: 'Artemis',
         referenceFrame: 'Sky',
