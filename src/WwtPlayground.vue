@@ -466,7 +466,7 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_altUnit(AltUnits.astronomicalUnits);
       layer.set_markerScale(MarkerScales.screen);
       layer.set_plotType(PlotTypes.gaussian);
-      layer.set_scaleFactor(30);
+      layer.set_scaleFactor(25);
       layer.set_color(Color.fromHex("#df1c23")); // artemis
       layer.set_showFarSide(true);
       layer.set_opacity(100);
