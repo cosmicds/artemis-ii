@@ -138,12 +138,13 @@ function stepMs(daysPerSecond: number): number {
 const rates = [
   ['Real time', PLAY_INTERVAL_MS],
   ['1 hrs/sec', stepMs(1/24)],
+  ['3 hrs/sec', stepMs(3/24)],
   ['6 hrs/sec', stepMs(6/24)],
   ['12 hrs/sec', stepMs(0.5)],
   ['1 day/sec', stepMs(1)],
 ] as const;
 
-const rate = ref(rates[2][1]);
+const rate = ref(rates[3][1]);
 
 let interval: number | null = null;
 function setupInterval(stepMs: number) {
