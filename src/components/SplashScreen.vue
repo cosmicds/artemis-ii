@@ -38,7 +38,7 @@
           </div>
         </div>
         
-        <SplashGesture />
+        <!-- <SplashGesture /> -->
         
         <div>
           <v-btn

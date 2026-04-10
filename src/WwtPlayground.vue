@@ -133,7 +133,8 @@
         <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
         <div id="bottom-content">
-          <GesturePreview v-if="splashIsClosed" />
+          <!-- <GesturePreview /> -->
+          <SplashGesture v-if="splashIsClosed" />
           <ArtemisTimeControl
             v-model:time="currentTime"
             :can-create="positionSet"
@@ -193,6 +194,7 @@ import { CoordinatesType, MarkerScales, PlotTypes, ReferenceFrames, SolarSystemO
 import ArtemisTimeControl from "./components/ArtemisTimeControl.vue";
 import VideoWrapper from "./components/VideoWrapper.vue";
 import GesturePreview from "./components/GesturePreview.vue";
+import SplashGesture from "./components/SplashGesture.vue";
 
 import { useCameraUrl } from "./composables/useCameraUrl";
 import { moveViewCamera, layerManagerDraw, getDepth, getCoordinatesForScreenPoint,getScreenPointForCoordinates, transformPickPointToWorldSpace, transformWorldPointToPickSpace, renderOneFrame, makeFrustum, type CameraView } from "./wwt-hacks";

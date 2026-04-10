@@ -63,7 +63,9 @@
         r="14"
       />
     </svg>
-    <div class="label">{{ labelText }}</div>
+    <div class="label">
+      {{ labelText }}
+    </div>
   </div>
 </template>
 
