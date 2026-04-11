@@ -221,7 +221,7 @@ import { moveViewCamera, layerManagerDraw, getDepth, getCoordinatesForScreenPoin
 import { LayerManager, WWTControl } from "@wwtelescope/engine";
 import { AltUnits } from "@wwtelescope/engine-types";
 
-import { loadHorizonsVectorsForWwt } from "./horizons";
+import { parseHorizonsVectorsForWwt } from "./horizons";
 import SplashScreen from "./components/SplashScreen.vue";
 import InformationSheet from "./components/InformationSheet.vue";
 
@@ -403,43 +403,42 @@ const trackingCenter = ref<SolarSystemObjects>(SolarSystemObjects.moon);
 
 const showTrajectory = ref(true);
 
+import horizonsData from "@/assets/horizons_results-earth.txt?raw";
+
 
 import { OrbitLineList, Vector3d } from "@wwtelescope/engine";
 function createArtemisOrbitLineList(trackedObject: SolarSystemObjects) {
   const lineList = new OrbitLineList();
   const colorHex = "#ffffff";
   const color = Color.fromHex(colorHex);
-  console.log(Color);
   color.a = 255;
-  const vec = loadHorizonsVectorsForWwt('./horizons_results-earth.txt', SolarSystemObjects.earth, trackedObject).then(vec => {
-    const items = vec.split("\r\n");
-    const header = items.shift();
-    const points = items.map(line => {
-      const parts = line.split(",");
-      return Vector3d.create(
-        +parts[2],
-        +parts[4],
-        +parts[3]
-      );
-    });
-    for (let i = 1; i < points.length; i++) {
-      lineList.addLine(
-        points[i - 1], 
-        points[i], 
-        color,
-        color,
-      );
-    }
+  const vec = parseHorizonsVectorsForWwt(horizonsData, SolarSystemObjects.earth, trackedObject);
+  const items = vec.split("\r\n");
+  const header = items.shift();
+  const points = items.map(line => {
+    const parts = line.split(",");
+    return Vector3d.create(
+      +parts[2],
+      +parts[4],
+      +parts[3]
+    );
   });
-  console.log(lineList);
+  for (let i = 1; i < points.length; i++) {
+    lineList.addLine(
+      points[i - 1], 
+      points[i], 
+      color,
+      color,
+    );
+  }
   return lineList;
 }
 
 
 
-async function createArtemisLayers(trackedObject: SolarSystemObjects) {
+function createArtemisLayers(trackedObject: SolarSystemObjects) {
 
-  const vec = await loadHorizonsVectorsForWwt('./horizons_results-earth.txt', SolarSystemObjects.earth, trackedObject);
+  const vec =   parseHorizonsVectorsForWwt(horizonsData, SolarSystemObjects.earth, trackedObject);
   const items = vec.split("\r\n");
   const header = items.shift();
   let bounds: [number, number][] = [];
@@ -508,47 +507,10 @@ async function createArtemisLayers(trackedObject: SolarSystemObjects) {
     
   });
 
-  const showMoonRefLayer = false;
-  if (showMoonRefLayer) {
-    const vecMoon = await loadHorizonsVectorsForWwt('./horizons_results-moon.txt', SolarSystemObjects.moon, trackedObject);
-    store.createTableLayer({
-      name: 'Artemis Moon',
-      referenceFrame: 'Sky',
-      dataCsv: vecMoon,
-    }).then(layer => {
-      layer.set_xAxisColumn(2);
-      layer.set_yAxisColumn(3);
-      layer.set_zAxisColumn(4);
-      layer.set_coordinatesType(CoordinatesType.rectangular);
-      layer.set_astronomical(true);
-      layer.set_cartesianScale(AltUnits.astronomicalUnits);
-      layer.set_altUnit(AltUnits.astronomicalUnits);
-      layer.set_markerScale(MarkerScales.screen);
-      layer.set_scaleFactor(5);
-      layer.set_color(Color.fromHex("#00ffff"));
-      layer.set_showFarSide(true);
-      layer.set_opacity(25);
-      layers.value.push(layer);
-    });
-
-  }
 
 }
 
-// watch(zoomSliderValue, (z) => {
-//   layers.value.forEach(layer => {
-//     if (layer.get_name() !== "Artemis") {
-//       return;
-//     }
-//     if (z > 0.7) {
-//       layer.set_markerScale(MarkerScales.world);
-//       layer.set_scaleFactor(0.02);
-//     } else {
-//       layer.set_markerScale(MarkerScales.screen);
-//       layer.set_scaleFactor(10);   
-//     }
-//   });
-// });
+
 
 function removeArtemisLayers() {
   console.log('remove layers');
