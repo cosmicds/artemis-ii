@@ -4,6 +4,7 @@ const FIVE_MINUTES = 5 * 60 * 1000;
 const D2S = 24 * 60 * 60;
 
 
+
 /** relative to normal ecliptic coordinates, (used by spreadsheetlayer)
  * this returns (X, Z, Y)
 **/
@@ -14,9 +15,8 @@ function correctionVector(jd: number, coordinateReferenceFrame: SolarSystemObjec
   return Vector3d.subtractVectors(trackingRef,coordRef); // returns a vector ordered x, z, y
 }
 
-export async function loadHorizonsVectorsForWwt(url: string, horizonsCenter = SolarSystemObjects.earth, wwtTrackingObject = SolarSystemObjects.moon): Promise<string> {
-  const rawText = await fetch(url).then(r => r.text());
-  return parseHorizonsVectorsForWwt(rawText, horizonsCenter, wwtTrackingObject);
+export async function loadHorizonsVectorsForWwt(horizonsData: string, horizonsCenter = SolarSystemObjects.earth, wwtTrackingObject = SolarSystemObjects.moon): Promise<string> {
+  return parseHorizonsVectorsForWwt(horizonsData, horizonsCenter, wwtTrackingObject);
 }
 
 
