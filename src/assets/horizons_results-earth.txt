@@ -68,14 +68,15 @@
     launch + 8/19:18   10 17:53    - Return trajectory correction burn #3
                                       Total delta-v = 1.28 m/s, length 8 sec.
              9/00:58   10 23:33    - Orion 2 crew and service module separation
-             9/01:01   10 23:36    - Crew module raise burn (19 seconds)
+             9/01:01   10 23:36    - Crew module raise burn 
+                                      (length 19 sec., total delta-v= 3.0 m/s)
              9/01:18   10 23:53    - Entry interface (122 km above Earth)
                                      Events by altitude:
                                       11 km : Forward bay cover deploys
                                       7.6 km: Droque parachute deploys
                                       2.9 km: Pilot parachutes deploy @ 2.9 km,
                                               pulling out 3 main parachutes
-             9/01:32   11 00:07:07 - Splashdown, Pacific Ocean, off Baja Cali.
+             9/01:32   11 00:07    - Splashdown, Pacific Ocean, off Baja Cali.
                                       2.5 hours before sunset
              9/01:47   11 00:22    - Orion 2 final power down
              9/02:17   11 00:52    - Astronaut egress complete
@@ -139,7 +140,7 @@
 
 
 *******************************************************************************
-Ephemeris / WWW_USER Fri Apr 10 13:09:12 2026 Pasadena, USA      / Horizons
+Ephemeris / WWW_USER Sat Apr 11 08:05:46 2026 Pasadena, USA      / Horizons
 *******************************************************************************
 Target body name: Artemis II (spacecraft) (-1024) {source: Artemis_II_merged}
 Center body name: Earth (399)                     {source: DE441}
@@ -156,8 +157,8 @@ Output units    : AU-D
 Calendar mode   : Mixed Julian/Gregorian
 Output type     : GEOMETRIC cartesian states
 Output format   : 1 (position only)
-EOP file        : eop.260409.p260706
-EOP coverage    : DATA-BASED 1962-JAN-20 TO 2026-APR-09. PREDICTS-> 2026-JUL-05
+EOP file        : eop.260410.p260707
+EOP coverage    : DATA-BASED 1962-JAN-20 TO 2026-APR-10. PREDICTS-> 2026-JUL-06
 Reference frame : Ecliptic of J2000.0
 *******************************************************************************
             JDTDB,            Calendar Date (TDB),        delta-T,                      X,                      Y,                      Z,
