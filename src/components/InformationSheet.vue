@@ -345,11 +345,13 @@ defineProps<Props>();
   }
 
   .scrollable {
-    overflow-y: auto;
+    overflow-y: visible;
+    height: 100%;
   }
 
   #tab-items {
-    // padding-bottom: 2px !important;
+    height: calc(100% - 32px);
+    overflow-y: auto;
 
     .v-card-text {
       font-size: ~"max(14px, calc(0.7em + 0.3vw))";
