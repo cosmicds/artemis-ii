@@ -62,13 +62,16 @@ import { SpaceTimeController } from "@wwtelescope/engine";
 interface Props {
   canCreate: boolean;
   initialTime: Date;
+  startTime: Date;
+  endTime: Date;
+  step: number;
 }
 
 const props = defineProps<Props>();
   
 const currentTime = defineModel<Date>('time', {default: new Date()});
 SpaceTimeController.set_now(props.initialTime);
-console.log(currentTime.value, props.initialTime);
+
 watch(currentTime, (date) => {
   SpaceTimeController.set_now(date);
 });
@@ -92,10 +95,10 @@ function goToNow() {
 
 
 // 2026-Apr-02 01:59:00.0000
-const MISSION_START = new Date("2026-04-02T01:59:00Z");
+const MISSION_START = props.startTime ?? new Date("2026-04-02T01:59:00Z");
 // 2026-Apr-10 23:54:00.0000
-const MISSION_END   = new Date("2026-04-10T23:54:00Z");
-const STEP_MS       = 5 * 60 * 1000;
+const MISSION_END   = props.endTime ?? new Date("2026-04-10T23:54:00Z");
+const STEP_MS       = props.step ?? 5 * 60 * 1000;
 
 const INITIAL_TIME = props.initialTime; //new Date("2026-04-06T22:32:00Z");
 

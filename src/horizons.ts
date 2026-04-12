@@ -1,5 +1,5 @@
-import { SpaceTimeController, Planets, Vector3d } from "@wwtelescope/engine";
-import { SolarSystemObjects } from "@wwtelescope/engine-types";
+import { SpaceTimeController, Planets, Vector3d, type SpreadSheetLayer } from "@wwtelescope/engine";
+import { SolarSystemObjects, AltUnits, CoordinatesType } from "@wwtelescope/engine-types";
 const FIVE_MINUTES = 5 * 60 * 1000;
 const D2S = 24 * 60 * 60;
 
@@ -63,4 +63,46 @@ export function parseHorizonsVectorsForWwt(rawText: string, horizonsCenter = Sol
   }
   );
   return ["jdtdb,date,x,y,z,end", ...rows].join("\r\n");
+}
+
+
+/**
+ * get the start and end time of the horizons data
+ * horizonsCsvString is the output of parseHorizonsVectorsForWwt
+ */
+export function getHorizonsStartEndTimes(horizonsCsvString: string): { start: Date, end: Date, deltaT: number } {
+  let lines = horizonsCsvString.split(/\r?\n/);
+  if (!lines[0].startsWith("jdtdb")) {
+    lines = parseHorizonsVectorsForWwt(horizonsCsvString).split(/\r?\n/);
+  }
+
+  const firstLine = lines[1];
+  const secondLine = lines[2];
+  const lastLine = lines[lines.length - 1];
+  
+  // the strings are ISO strings with 'Z' at the end, so this will be parsed as UTC time
+  const startDate = new Date(firstLine.split(",")[1]); 
+  const endDate = new Date(lastLine.split(",")[1]);
+  
+  const stepMs = new Date(secondLine.split(",")[1]).getTime() - startDate.getTime();
+
+  return { start: startDate, end: endDate, deltaT: stepMs };
+}
+
+
+/**
+ * Setup the spreadsheet layer columns and
+ * coordinates after createTableLayer creates the layer
+ * then style the output.
+ */
+export function setupHorizonsSpreadSheetLayer(layer: SpreadSheetLayer) {
+  layer.set_xAxisColumn(2);
+  layer.set_yAxisColumn(3);
+  layer.set_zAxisColumn(4);
+  layer.set_coordinatesType(CoordinatesType.rectangular);
+  layer.set_astronomical(true);
+  layer.set_cartesianScale(AltUnits.astronomicalUnits);
+  layer.set_altUnit(AltUnits.astronomicalUnits);
+  layer.set_showFarSide(true);
+  return layer;
 }
