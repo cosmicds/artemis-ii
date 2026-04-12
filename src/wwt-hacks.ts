@@ -16,6 +16,7 @@ import {
   Settings,
   SpaceTimeController,
   SpreadSheetLayer,
+  PushPin,
   Tile,
   TileCache,
   TourPlayer,
@@ -715,3 +716,84 @@ export function layerManagerDraw(renderContext, opacity, astronomical, reference
     renderContext.set_world(matOld);
     renderContext.set_worldBaseNonRotating(matOldNonRotating);
 };
+
+
+
+export function spreadSheetLayerDraw(renderContext, opacity, flat) {
+    var device = renderContext;
+    if (this.version !== this.lastVersion) {
+        this.cleanUp();
+    }
+    this.lastVersion = this.version;
+    if (this.bufferIsFlat !== flat) {
+        this.cleanUp();
+        this.bufferIsFlat = flat;
+    }
+    if (this.dirty) {
+        this.prepVertexBuffer(device, opacity);
+    }
+    var jNow = SpaceTimeController.get_jNow() - SpaceTimeController.utcToJulian(this.baseDate);
+    var adjustedScale = this.scaleFactor * 3;
+    if (flat && this.astronomical && (this._markerScale$1 === 1)) {
+        adjustedScale = (this.scaleFactor / (renderContext.viewCamera.zoom / 360));
+    }
+    if (this.triangleList2d != null) {
+        this.triangleList2d.decay = this.decay;
+        this.triangleList2d.sky = this.get_astronomical();
+        this.triangleList2d.timeSeries = this.timeSeries;
+        this.triangleList2d.jNow = jNow;
+        this.triangleList2d.draw(renderContext, opacity * this.get_opacity(), 1);
+    }
+    if (this.triangleList != null) {
+        this.triangleList.decay = this.decay;
+        this.triangleList.sky = this.get_astronomical();
+        this.triangleList.timeSeries = this.timeSeries;
+        this.triangleList.jNow = jNow;
+        this.triangleList.draw(renderContext, opacity * this.get_opacity(), 1);
+    }
+    if (this.pointList != null) {
+        this.pointList.depthBuffered = false;
+        this.pointList.showFarSide = this.get_showFarSide();
+        this.pointList.decay = (this.timeSeries) ? this.decay : 0;
+        this.pointList.sky = this.get_astronomical();
+        this.pointList.timeSeries = this.timeSeries;
+        this.pointList.jNow = jNow;
+        this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+        switch (this._plotType$1) {
+            case 0:
+                this.pointList.draw(renderContext, opacity * this.get_opacity(), false);
+                break;
+            case 2:
+                this.pointList.drawTextured(renderContext, SpreadSheetLayer.get__circleTexture$1().texture2d, opacity * this.get_opacity());
+                break;
+            case 1:
+                this.pointList.drawTextured(renderContext, PushPin.getPushPinTexture(19), opacity * this.get_opacity());
+                break;
+            case 3:
+                this.pointList.drawTextured(renderContext, PushPin.getPushPinTexture(35), opacity * this.get_opacity());
+                break;
+            case 5:
+            case 4:
+                this.pointList.drawTextured(renderContext, PushPin.getPushPinTexture(this._markerIndex$1), opacity * this.get_opacity());
+                break;
+            default:
+                break;
+        }
+    }
+    if (this.lineList != null) {
+        this.lineList.sky = this.get_astronomical();
+        this.lineList.decay = this.decay;
+        this.lineList.timeSeries = this.timeSeries;
+        this.lineList.jNow = jNow;
+        this.lineList.drawLines(renderContext, opacity * this.get_opacity());
+    }
+    if (this.lineList2d != null) {
+        this.lineList2d.sky = this.get_astronomical();
+        this.lineList2d.decay = this.decay;
+        this.lineList2d.timeSeries = this.timeSeries;
+        this.lineList2d.showFarSide = this.get_showFarSide();
+        this.lineList2d.jNow = jNow;
+        this.lineList2d.drawLines(renderContext, opacity * this.get_opacity());
+    }
+    return true;
+}
