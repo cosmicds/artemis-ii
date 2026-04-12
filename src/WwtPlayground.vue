@@ -154,6 +154,9 @@
             v-model:time="currentTime"
             :can-create="positionSet"
             :initial-time="INITIAL_TIME"
+            :start-time="MISSION_START"
+            :end-time="MISSION_END"
+            :step="horizonTimeDelta"
           />
           <div
             v-if="smallSize"
@@ -231,6 +234,9 @@ const webglDisabled = ref(false);
 import { useScaledZoom } from "./composables/useScaledZoom";
 const { zoomSliderValue, onZoomSlider, zoomIn, zoomOut, ZOOM_MAX, ZOOM_MIN } = useScaledZoom();
 
+import { clampedTime } from "./utils";
+import horizonsData from "@/assets/horizons_results-earth.txt?raw";
+import { getHorizonsStartEndTimes } from "./horizons";
 
 
 export interface WwtPlaygroundProps {
@@ -268,13 +274,11 @@ const buttonColor = ref("#ffffff");
 const VIDEO_URL = "https://www.youtube.com/embed/ML9y0Z7A8ec?autoplay=1&mute=1";
 
 
-// 2026-Apr-02 01:59:00.0000
-const MISSION_START = new Date("2026-04-02T01:59:00Z");
-// 2026-Apr-10 23:54:00.0000
-const MISSION_END   = new Date("2026-04-10T23:54:00Z");
-// HOME_TIME shoul be clamped as now between START and END
-const now = new Date();
-const HOME_TIME = new Date(Math.min(Math.max(now.getTime(), MISSION_START.getTime()), MISSION_END.getTime()));
+
+
+
+const { start: MISSION_START, end: MISSION_END, deltaT: horizonTimeDelta } = getHorizonsStartEndTimes(horizonsData);
+const HOME_TIME = clampedTime(new Date(), MISSION_START, MISSION_END);
 const urlTime = new URLSearchParams(window.location.search).get("time");
 
 
@@ -337,7 +341,7 @@ const trackingCenter = ref<SolarSystemObjects>(SolarSystemObjects.moon);
 
 const showTrajectory = ref(true);
 
-import horizonsData from "@/assets/horizons_results-earth.txt?raw";
+
 
 
 import { OrbitLineList, Vector3d } from "@wwtelescope/engine";
