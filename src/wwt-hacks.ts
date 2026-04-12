@@ -771,6 +771,7 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
         // *** so then in a pixel - every point in that pixel get's drawn at the same depth, 
         // **** according to where this layer is in the order?
         // with shallowLayerTest always returning true, this renders properly
+        // const ogDepthMaskValue = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK)
         renderContext.gl.depthMask(false)
         switch (this._plotType$1) {
             case 0:
@@ -792,7 +793,9 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
             default:
                 break;
         }
-        renderContext.gl.depthMask(true);
+        // renderContext.gl.depthMask(ogDepthMaskValue);
+        renderContext.gl.depthMask(true); // checked. ogDepthMaskValue is true
+        
     }
     if (this.lineList != null) {
         this.lineList.sky = this.get_astronomical();
