@@ -397,23 +397,23 @@ function createArtemisLayers(trackedObject: SolarSystemObjects) {
   const vec =   parseHorizonsVectorsForWwt(horizonsData, SolarSystemObjects.earth, trackedObject);
   
   // REMOVE: temp for degugging layer order
-  createHorizonsSpreadSheetLayer('Artemis', vec, 'Sky')
-    .then(layer => {
-      layer.set_markerScale(MarkerScales.screen);
-      layer.set_plotType(PlotTypes.gaussian);
-      layer.set_scaleFactor(20);
-      layer.set_color(Color.fromHex("#ffffff")); // artemis
-      layer.set_showFarSide(true);
-      layer.set_opacity(100);
-      layers.value.push(layer);
-    });
+  // createHorizonsSpreadSheetLayer('Artemis', vec, 'Sky')
+  //   .then(layer => {
+  //     layer.set_markerScale(MarkerScales.world);
+  //     layer.set_plotType(PlotTypes.gaussian);
+  //     layer.set_scaleFactor(0.0012);
+  //     layer.set_color(Color.fromHex("#ffffff")); // artemis
+  //     layer.set_showFarSide(true);
+  //     layer.set_opacity(100);
+  //     layers.value.push(layer);
+  //   });
     
   
   createHorizonsSpreadSheetLayer('Artemis Time', vec, 'Sky')
     .then(layer => {
       layer.set_markerScale(MarkerScales.screen);
       layer.set_plotType(PlotTypes.gaussian);
-      layer.set_scaleFactor(40);
+      layer.set_scaleFactor(25);
       layer.set_color(Color.fromHex("#df1c23")); // artemis
       layer.set_showFarSide(true);
       layer.set_opacity(100);
