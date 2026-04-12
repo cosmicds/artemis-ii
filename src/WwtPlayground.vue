@@ -396,7 +396,7 @@ function createArtemisLayers(trackedObject: SolarSystemObjects) {
   const header = items.shift();
   let bounds: [number, number][] = [];
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const N = 2;
+  const N = 10;
   const centerStart = 1300;
   const centerEnd = 1500;
   const end = items.length;
@@ -407,6 +407,18 @@ function createArtemisLayers(trackedObject: SolarSystemObjects) {
   bounds.forEach((bds) => {
     const data = items.slice(...bds).join("\r\n");
 
+    // REMOVE: temp for degugging layer order
+    createHorizonsSpreadSheetLayer('Artemis Time', `${header}\r\n${data}`, 'Sky')
+      .then(layer => {
+        layer.set_markerScale(MarkerScales.world);
+        layer.set_plotType(PlotTypes.gaussian);
+        layer.set_scaleFactor(0.0012);
+        layer.set_color(Color.fromHex("#00ffff")); // artemis
+        layer.set_showFarSide(true);
+        layer.set_opacity(100);
+        layers.value.push(layer);
+      });
+    
     createHorizonsSpreadSheetLayer('Artemis Time', `${header}\r\n${data}`, 'Sky')
       .then(layer => {
         layer.set_markerScale(MarkerScales.screen);
