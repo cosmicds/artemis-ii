@@ -395,48 +395,35 @@ function createHorizonsSpreadSheetLayer(name: string, dataCsv: string, reference
 
 function createArtemisLayers(trackedObject: SolarSystemObjects) {
   const vec =   parseHorizonsVectorsForWwt(horizonsData, SolarSystemObjects.earth, trackedObject);
-  const items = vec.split("\r\n");
-  const header = items.shift();
-  let bounds: [number, number][] = [];
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const N = 10;
-  const centerStart = 1300;
-  const centerEnd = 1500;
-  const end = items.length;
-  for (let i = centerStart; i < centerEnd; i += N) {
-    bounds.push([i, i + N]);
-  }
-  bounds = [[0, centerStart], ...bounds, [centerEnd, end]];
-  bounds.forEach((bds) => {
-    const data = items.slice(...bds).join("\r\n");
-
-    // REMOVE: temp for degugging layer order
-    createHorizonsSpreadSheetLayer('Artemis', `${header}\r\n${data}`, 'Sky')
-      .then(layer => {
-        layer.set_markerScale(MarkerScales.screen);
-        layer.set_plotType(PlotTypes.gaussian);
-        layer.set_scaleFactor(20);
-        layer.set_color(Color.fromHex("#ffffff")); // artemis
-        layer.set_showFarSide(true);
-        layer.set_opacity(100);
-        layers.value.push(layer);
-      });
+  
+  // REMOVE: temp for degugging layer order
+  createHorizonsSpreadSheetLayer('Artemis', vec, 'Sky')
+    .then(layer => {
+      layer.set_markerScale(MarkerScales.screen);
+      layer.set_plotType(PlotTypes.gaussian);
+      layer.set_scaleFactor(20);
+      layer.set_color(Color.fromHex("#ffffff")); // artemis
+      layer.set_showFarSide(true);
+      layer.set_opacity(100);
+      layers.value.push(layer);
+    });
     
-    createHorizonsSpreadSheetLayer('Artemis Time', `${header}\r\n${data}`, 'Sky')
-      .then(layer => {
-        layer.set_markerScale(MarkerScales.screen);
-        layer.set_plotType(PlotTypes.gaussian);
-        layer.set_scaleFactor(25);
-        layer.set_color(Color.fromHex("#df1c23")); // artemis
-        layer.set_showFarSide(true);
-        layer.set_opacity(100);
-        layer.set_startDateColumn(1);
-        layer.set_endDateColumn(1);
-        layer.set_decay(4.9 / (60 * 24));
-        layer.set_timeSeries(true);
-        layers.value.push(layer);
-      });
-  });
+  
+  createHorizonsSpreadSheetLayer('Artemis Time', vec, 'Sky')
+    .then(layer => {
+      layer.set_markerScale(MarkerScales.screen);
+      layer.set_plotType(PlotTypes.gaussian);
+      layer.set_scaleFactor(40);
+      layer.set_color(Color.fromHex("#df1c23")); // artemis
+      layer.set_showFarSide(true);
+      layer.set_opacity(100);
+      layer.set_startDateColumn(1);
+      layer.set_endDateColumn(1);
+      layer.set_decay(4.9 / (60 * 24));
+      layer.set_timeSeries(true);
+      layers.value.push(layer);
+    });
+
 }
 
 function removeArtemisLayers() {
