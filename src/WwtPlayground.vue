@@ -206,37 +206,48 @@
 </template>
 
 <script setup lang="ts">
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { ref, reactive, computed, onMounted, watch } from "vue";
-import { GotoRADecZoomParams, engineStore } from "@wwtelescope/engine-pinia";
-import { BackgroundImageset, supportsTouchscreen, useWWTKeyboardControls, CreditLogos, IconButton, useFullscreen } from "@cosmicds/vue-toolkit";
+import { ref, computed, onMounted, watch } from "vue";
+import { engineStore } from "@wwtelescope/engine-pinia";
+import { supportsTouchscreen, useWWTKeyboardControls, CreditLogos, IconButton, useFullscreen } from "@cosmicds/vue-toolkit";
 import { useDisplay } from "vuetify";
-import { D2R, H2R  } from "@wwtelescope/astro";
-import { AstroCalc, Color, SpreadSheetLayer } from "@wwtelescope/engine";
-import { CoordinatesType, MarkerScales, PlotTypes, ReferenceFrames, SolarSystemObjects } from "@wwtelescope/engine-types";
+import { Color, SpreadSheetLayer, OrbitLineList, LayerManager, WWTControl, Vector3d } from "@wwtelescope/engine";
+import { CoordinatesType, MarkerScales, PlotTypes, SolarSystemObjects, AltUnits } from "@wwtelescope/engine-types";
+
+/* Component imports */
 import ArtemisTimeControl from "./components/ArtemisTimeControl.vue";
 import VideoWrapper from "./components/VideoWrapper.vue";
-import GesturePreview from "./components/GesturePreview.vue";
 import SplashGesture from "./components/SplashGesture.vue";
-
-import { useCameraUrl } from "./composables/useCameraUrl";
-import { moveViewCamera, layerManagerDraw, getDepth, getCoordinatesForScreenPoint,getScreenPointForCoordinates, transformPickPointToWorldSpace, transformWorldPointToPickSpace, renderOneFrame, makeFrustum, type CameraView } from "./wwt-hacks";
-import { LayerManager, WWTControl } from "@wwtelescope/engine";
-import { AltUnits } from "@wwtelescope/engine-types";
-
-import { parseHorizonsVectorsForWwt } from "./horizons";
 import SplashScreen from "./components/SplashScreen.vue";
 import InformationSheet from "./components/InformationSheet.vue";
+
 
 import WebGlTest from "./components/WebGlTest.vue";
 const webglDisabled = ref(false);
 
-import { useScaledZoom } from "./composables/useScaledZoom";
-const { zoomSliderValue, onZoomSlider, zoomIn, zoomOut, ZOOM_MAX, ZOOM_MIN } = useScaledZoom();
-
+/* local imports */
+import { useCameraUrl } from "./composables/useCameraUrl";
+import { 
+  moveViewCamera, 
+  layerManagerDraw, 
+  getDepth, 
+  getCoordinatesForScreenPoint,
+  getScreenPointForCoordinates, 
+  transformPickPointToWorldSpace, 
+  transformWorldPointToPickSpace, 
+  renderOneFrame,
+  makeFrustum, 
+  addToWWTRenderLoop,
+  removeFromWWTRenderLoop,
+  type CameraView 
+} from "./wwt-hacks";
 import { clampedTime } from "./utils";
+
+
+import { parseHorizonsVectorsForWwt, getHorizonsStartEndTimes } from "./horizons";
 import horizonsData from "@/assets/horizons_results-earth.txt?raw";
-import { getHorizonsStartEndTimes } from "./horizons";
+
+import { useScaledZoom } from "./composables/useScaledZoom";
+const { zoomSliderValue, onZoomSlider, zoomIn, zoomOut, ZOOM_MAX } = useScaledZoom();
 
 
 export interface WwtPlaygroundProps {
@@ -254,15 +265,17 @@ const store = engineStore();
 
 useWWTKeyboardControls(store);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const touchscreen = supportsTouchscreen();
 const { smAndDown } = useDisplay();
 
-const props = withDefaults(defineProps<WwtPlaygroundProps>(), {
+// the prop get automatically destructed and is available in the <template>
+withDefaults(defineProps<WwtPlaygroundProps>(), {
   wwtNamespace: "wwt-playground",
 });
 
 
-const backgroundImagesets = reactive<BackgroundImageset[]>([]);
+
 const showInfoSheet = ref(false);
 const showSplashScreen = ref(true);
 const splashIsClosed = ref(false);
@@ -281,10 +294,10 @@ const { start: MISSION_START, end: MISSION_END, deltaT: horizonTimeDelta } = get
 const HOME_TIME = clampedTime(new Date(), MISSION_START, MISSION_END);
 const urlTime = new URLSearchParams(window.location.search).get("time");
 
-
-
 const INITIAL_TIME = ref(urlTime ? new Date(+urlTime) : HOME_TIME);
-// ?lng=214.660687&lat=13.418963&fov=0.000511&rot=0.000000&angle=0.000000&time=1775514752592
+const currentTime = ref(INITIAL_TIME.value);
+
+
 const INITIAL_VIEW: CameraView = {
   lng: 214.660687,
   lat: 13.418963,
@@ -294,26 +307,17 @@ const INITIAL_VIEW: CameraView = {
   time: INITIAL_TIME.value.getTime()
 };
 
-// http://localhost:5174/?lng=316.555988&lat=74.277000&fov=0.017202&rot=0.000000&angle=0.000000&time=1775474823266
 const EARTH_VIEW: CameraView = {
   lng: 316.555988,
   lat: 74.277000,
   zoomDeg: 0.017202,
   rotationDeg: 0,
   angleDeg: 0,
-  time: 1775474823266
+  time: INITIAL_TIME.value.getTime() // this doesn't actually get used
 };
 
-const { copyViewUrl, copySuccess } = useCameraUrl(INITIAL_VIEW);
+const { copyViewUrl, copySuccess, afterInitialized } = useCameraUrl(INITIAL_VIEW);
 
-
-const currentTime = ref(INITIAL_TIME.value);
-
-function goHome() {
-  currentTime.value = INITIAL_TIME.value;
-  trackingCenter.value = SolarSystemObjects.moon;
-  moveViewCamera(INITIAL_VIEW, false);
-}
 
 function doWWTHacks() {
   WWTControl.singleton.getScreenPointForCoordinates = getScreenPointForCoordinates.bind(WWTControl.singleton);
@@ -341,10 +345,15 @@ const trackingCenter = ref<SolarSystemObjects>(SolarSystemObjects.moon);
 
 const showTrajectory = ref(true);
 
+const showSkyBackground = ref(true);
+
+function goHome() {
+  currentTime.value = INITIAL_TIME.value;
+  trackingCenter.value = SolarSystemObjects.moon;
+  moveViewCamera(INITIAL_VIEW, false);
+}
 
 
-
-import { OrbitLineList, Vector3d } from "@wwtelescope/engine";
 function createArtemisOrbitLineList(trackedObject: SolarSystemObjects) {
   const lineList = new OrbitLineList();
   const colorHex = "#ffffff";
@@ -352,7 +361,7 @@ function createArtemisOrbitLineList(trackedObject: SolarSystemObjects) {
   color.a = 255;
   const vec = parseHorizonsVectorsForWwt(horizonsData, SolarSystemObjects.earth, trackedObject);
   const items = vec.split("\r\n");
-  const header = items.shift();
+  // const header = items.shift();
   const points = items.map(line => {
     const parts = line.split(",");
     return Vector3d.create(
@@ -375,7 +384,6 @@ function createArtemisOrbitLineList(trackedObject: SolarSystemObjects) {
 
 
 function createArtemisLayers(trackedObject: SolarSystemObjects) {
-
   const vec =   parseHorizonsVectorsForWwt(horizonsData, SolarSystemObjects.earth, trackedObject);
   const items = vec.split("\r\n");
   const header = items.shift();
@@ -391,31 +399,6 @@ function createArtemisLayers(trackedObject: SolarSystemObjects) {
   bounds = [[0, centerStart], ...bounds, [centerEnd, end]];
   bounds.forEach((bds) => {
     const data = items.slice(...bds).join("\r\n");
-
-    // if (showTrajectory.value) {
-    //   store.createTableLayer({
-    //     name: 'Artemis',
-    //     referenceFrame: 'Sky',
-    //     dataCsv: `${header}\r\n${data}`,
-    //   }).then(layer => {
-    //     layer.set_xAxisColumn(2);
-    //     layer.set_yAxisColumn(3);
-    //     layer.set_zAxisColumn(4);
-    //     layer.set_coordinatesType(CoordinatesType.rectangular);
-    //     layer.set_astronomical(true);
-    //     layer.set_cartesianScale(AltUnits.astronomicalUnits);
-    //     layer.set_altUnit(AltUnits.astronomicalUnits);
-    //     layer.set_markerScale(MarkerScales.screen);
-    //     // layer.set_scaleFactor(.0012);
-    //     layer.set_scaleFactor(10);
-    //     layer.set_color(Color.fromHex("#ffffff"));
-    //     layer.set_showFarSide(true);
-    //     layer.set_opacity(25);
-    //     layers.value.push(layer);
-    //   });
-    // }
-
-
 
     store.createTableLayer({
       name: 'Artemis Time',
@@ -441,14 +424,8 @@ function createArtemisLayers(trackedObject: SolarSystemObjects) {
       layer.set_timeSeries(true);
       layers.value.push(layer);
     });
-    
-    
   });
-
-
 }
-
-
 
 function removeArtemisLayers() {
   console.log('remove layers');
@@ -456,22 +433,30 @@ function removeArtemisLayers() {
   layers.value = [];
 }
 
-const showSkyBackground = ref(true);
 
 
-import { addToWWTRenderLoop, removeFromWWTRenderLoop } from "./wwt-hacks";
-const artemisOrbitLineList = ref(createArtemisOrbitLineList(trackingCenter.value));
+
+const artemisOrbitLineList = ref<OrbitLineList | null>(null);
 
 function setArtemisLineList() {
   artemisOrbitLineList.value = createArtemisOrbitLineList(trackingCenter.value);
 }
 function drawArtemisOrbit () {
-  if (showTrajectory.value) {
+  if (showTrajectory.value && artemisOrbitLineList.value) {
     artemisOrbitLineList.value.set_depthBuffered(true);
     artemisOrbitLineList.value.drawLines(WWTControl.singleton.renderContext, 1, Color.fromHex("#ffffff"));
   }
 }
 
+function createArtemisOrbit() {
+  setArtemisLineList();
+  addToWWTRenderLoop(() => {
+    drawArtemisOrbit();
+  });
+}
+function removeArtemisOrbit() {
+  removeFromWWTRenderLoop(drawArtemisOrbit);
+}
 
 onMounted(() => {
   
@@ -497,12 +482,9 @@ onMounted(() => {
     store.applySetting(["solarSystemCosmos", true]);
     store.applySetting(["solarSystemMilkyWay", showSkyBackground.value]);
     store.applySetting(["solarSystemStars", showSkyBackground.value]);
-    store.setTrackedObject(SolarSystemObjects.moon);
+    store.setTrackedObject(trackingCenter.value);
     
-    addToWWTRenderLoop(() => {
-      drawArtemisOrbit();
-    });
-
+  
     // @ts-expect-error this does exist
     WWTControl.singleton.shallowLayerTest = function(layer) {
       const table = layer.get__table();
@@ -520,13 +502,14 @@ onMounted(() => {
       return depth <= (moonDepth + 0.0000116 / 6); // magic number minor improvement to front side depth test
     }.bind(this);
 
-
-    store.setTrackedObject(trackingCenter.value);
+    
+    createArtemisOrbit();
     createArtemisLayers(trackingCenter.value);
 
 
-    
-    positionSet.value = true;
+    afterInitialized.then(() => {
+      positionSet.value = true;
+    });
     layersLoaded.value = true;
   });
 });
@@ -542,22 +525,19 @@ watch(showSkyBackground, (show) => {
 
 watch(trackingCenter, (trackedObject) => {
   removeArtemisLayers();
+  removeArtemisOrbit();
   store.setTrackedObject(trackedObject);
   if (trackedObject === SolarSystemObjects.earth) {
     moveViewCamera(EARTH_VIEW, false);
   }
   createArtemisLayers(trackedObject);
-  removeFromWWTRenderLoop(drawArtemisOrbit);
-  setArtemisLineList();
-  addToWWTRenderLoop(drawArtemisOrbit);
+  createArtemisOrbit();
 });
 
-watch(showTrajectory, (show) => {
+watch(showTrajectory, (_show) => {
   removeArtemisLayers();
+  removeArtemisOrbit();
   createArtemisLayers(trackingCenter.value);
-  removeFromWWTRenderLoop(drawArtemisOrbit);
-  setArtemisLineList();
-  addToWWTRenderLoop(drawArtemisOrbit);
 });
 
 const ready = computed(() => layersLoaded.value && positionSet.value);

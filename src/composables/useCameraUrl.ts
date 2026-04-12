@@ -3,6 +3,7 @@ import { WWTControl } from "@wwtelescope/engine";
 import { R2D } from "@wwtelescope/astro";
 import { moveViewCamera, type CameraView } from "../wwt-hacks";
 import { watch, onMounted, ref } from 'vue';
+import { usePromisedValue } from "./usePromisedValue";
 
 export function useCameraUrl(fallback: CameraView) {
   const store = engineStore();
@@ -14,6 +15,8 @@ export function useCameraUrl(fallback: CameraView) {
   const angleDeg    = () => WWTControl.singleton.renderContext.viewCamera.angle;
   const time        = () => store.currentTime.getTime();
   const successWatch = ref(false);
+  
+  const { promise: afterInitialized, value: moveInitialized } = usePromisedValue();
 
   function readUrl(): CameraView {
     const p = new URLSearchParams(window.location.search);
@@ -54,8 +57,9 @@ export function useCameraUrl(fallback: CameraView) {
   onMounted(() => {
     store.waitForReady().then(() => {
       moveViewCamera(readUrl(), true);
+      moveInitialized.value = true;
     });
   });
 
-  return { copyViewUrl, copySuccess: successWatch };
+  return { copyViewUrl, copySuccess: successWatch, afterInitialized };
 }
