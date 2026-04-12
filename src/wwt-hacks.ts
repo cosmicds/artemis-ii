@@ -257,25 +257,7 @@ export function getScreenPointForCoordinates(x, y, z=0) {
     return result;
 }
 
-// export function getDepth(x, y, z) {
-//   const pt = this.getScreenPointForCoordinates(x, y, z);
-//   const near = -1;
-//   const far = 1;
-//   const nearPt = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, true, near);
-//   const farPt = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, true, far);
-//   // In principle, should give the same value for y and z
-//   return (x - nearPt.x) / (farPt.x - nearPt.x);
-// }
 
-export function getDepth(x, y, z) {
-    const worldPoint = Vector3d.create(x, y, z);
-    var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
-    m = Matrix3d.multiplyMatrix(m, this.renderContext.get_projection());
-
-    var vz = (worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33() + m.get_m43());
-
-    return vz;
-}
 
 export function renderOneFrame() {
     if (this.renderContext.get_backgroundImageset() != null) {
@@ -417,7 +399,7 @@ export function renderOneFrame() {
         this.renderContext.makeFrustum();
         
         
-        LayerManager._draw(this.renderContext, 1, true, 'Sky', true, false, (layer) => this.shallowLayerTest ? !this.shallowLayerTest(layer) : false);
+
         this.renderContext.set_world(matOld);
         this.renderContext.makeFrustum();
 
@@ -431,11 +413,11 @@ export function renderOneFrame() {
             }
         }
 
-        if (this.shallowLayerTest) {
-          LayerManager._draw(this.renderContext, 1, true, 'Sky', true, false, (layer) => this.shallowLayerTest(layer));
-          this.renderContext.set_world(matOld);
-          this.renderContext.makeFrustum();
-        }
+
+        LayerManager._draw(this.renderContext, 1, true, 'Sky', true, false, null);
+        this.renderContext.set_world(matOld);
+        this.renderContext.makeFrustum();
+
 
     } else {
         // RenderType is not SolarSystem
@@ -621,43 +603,7 @@ export function makeFrustum() {
     this._setMatrixes();
 }
 
-// TODO: This doesn't work
-// export function getTableDataInView() {
-//     var data = '';
-//     var first = true;
-//     for (const col of this.get_header()) {
-//         if (!first) {
-//             data += '\t';
-//         }
-//         else {
-//             first = false;
-//         }
-//         data += col;
-//     }
-//     data += '\r\n';
-//     const planetMode = WWTControl.singleton.renderContext.get_backgroundImageset().get_dataSetType() < 2;
-//     for (const row of this.get__table().rows) {
-//         var x = parseFloat(row[this.get_xAxisColumn()]);
-//         var y = parseFloat(row[this.get_yAxisColumn()]);
-//         var z = parseFloat(row[this.get_zAxisColumn()]);
-//         var position = Vector3d.create(x, y, z);
-//         if (!this._isPointInFrustum$1(position, WWTControl.singleton.renderContext.get_frustum())) {
-//             continue;
-//         }
-//         first = true;
-//         for (const col of row) {
-//             if (!first) {
-//                 data += '\t';
-//             }
-//             else {
-//                 first = false;
-//             }
-//             data += col;
-//         }
-//         data += '\r\n';
-//     }
-//     return data;
-// }
+
 
 export function layerManagerDraw(renderContext, opacity, astronomical, referenceFrame, nested, cosmos, filter=null) {
     if (!(referenceFrame in LayerManager.get_allMaps())) {
@@ -704,7 +650,7 @@ export function layerManagerDraw(renderContext, opacity, astronomical, reference
                         if (SpaceTimeController.get_jNow() > layerEnd) {
                             fadeOpacity = ((fadeOut - SpaceTimeController.get_jNow()) / (layer.get_fadeSpan() / 864000000));
                         }
-                        if (filter && filter(layer)) {
+                        if (!filter || filter(layer)) {
                             layer.set_astronomical(astronomical);
                             layer.draw(renderContext, opacity * fadeOpacity, cosmos);
                         }
@@ -770,7 +716,7 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
         // updating the depth bugger.
         // *** so then in a pixel - every point in that pixel get's drawn at the same depth, 
         // **** according to where this layer is in the order?
-        // with shallowLayerTest always returning true, this renders properly
+
         // const ogDepthMaskValue = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK)
         renderContext.gl.depthMask(false)
         switch (this._plotType$1) {

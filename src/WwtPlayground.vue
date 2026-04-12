@@ -229,7 +229,6 @@ import { useCameraUrl } from "./composables/useCameraUrl";
 import { 
   moveViewCamera, 
   layerManagerDraw, 
-  getDepth, 
   getCoordinatesForScreenPoint,
   getScreenPointForCoordinates, 
   transformPickPointToWorldSpace, 
@@ -328,8 +327,6 @@ function doWWTHacks() {
   // @ts-expect-error this does exist
   WWTControl.singleton.transformPickPointToWorldSpace = transformPickPointToWorldSpace.bind(WWTControl.singleton);
   WWTControl.singleton.renderOneFrame = renderOneFrame.bind(WWTControl.singleton);
-  // @ts-expect-error this does exist
-  WWTControl.singleton.getDepth = getDepth.bind(WWTControl.singleton);
   // @ts-expect-error this does exist
   WWTControl.singleton.renderContext.makeFrustum = makeFrustum.bind(WWTControl.singleton.renderContext);
   // @ts-expect-error this does exist
@@ -482,12 +479,6 @@ onMounted(() => {
     store.applySetting(["solarSystemMilkyWay", showSkyBackground.value]);
     store.applySetting(["solarSystemStars", showSkyBackground.value]);
     store.setTrackedObject(trackingCenter.value);
-    
-  
-    // @ts-expect-error this does exist
-    WWTControl.singleton.shallowLayerTest = function(_layer) {
-      return true;
-    }.bind(this);
 
     
     createArtemisOrbit();
