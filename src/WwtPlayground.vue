@@ -211,7 +211,7 @@ import { engineStore } from "@wwtelescope/engine-pinia";
 import { supportsTouchscreen, useWWTKeyboardControls, CreditLogos, IconButton, useFullscreen } from "@cosmicds/vue-toolkit";
 import { useDisplay } from "vuetify";
 import { Color, SpreadSheetLayer, OrbitLineList, LayerManager, WWTControl, Vector3d } from "@wwtelescope/engine";
-import { CoordinatesType, MarkerScales, PlotTypes, SolarSystemObjects, AltUnits } from "@wwtelescope/engine-types";
+import { MarkerScales, PlotTypes, SolarSystemObjects } from "@wwtelescope/engine-types";
 
 /* Component imports */
 import ArtemisTimeControl from "./components/ArtemisTimeControl.vue";
