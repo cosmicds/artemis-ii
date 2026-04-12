@@ -415,7 +415,8 @@ export function renderOneFrame() {
         matLocal._multiply(Matrix3d.translation(vt));
         this.renderContext.set_world(matLocal);
         this.renderContext.makeFrustum();
-
+        
+        
         LayerManager._draw(this.renderContext, 1, true, 'Sky', true, false, (layer) => this.shallowLayerTest ? !this.shallowLayerTest(layer) : false);
         this.renderContext.set_world(matOld);
         this.renderContext.makeFrustum();
@@ -752,6 +753,11 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
         this.triangleList.draw(renderContext, opacity * this.get_opacity(), 1);
     }
     if (this.pointList != null) {
+        // so this ends up causing gl.enable(gl.DEPTH_TEST) 
+        // so that the test is run. if depth mask is true then buffers get written
+        // that is, if it is in front it get's written
+        // https://learnopengl.com/Advanced-OpenGL/Depth-testing
+        // https://gamedev.net/forums/topic/404620-clarifying-glenablegl_depth_test-and-gldepthmask/#post-3688636
         this.pointList.depthBuffered = true;
         this.pointList.showFarSide = this.get_showFarSide();
         this.pointList.decay = (this.timeSeries) ? this.decay : 0;
@@ -760,7 +766,12 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
         this.pointList.jNow = jNow;
         this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
         // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/depthMask
-        renderContext.gl.depthMask(false) // we're depth buffered, but no writing to it. works, buuuuuuut??????
+        // so we are running the depth test, but with this, then we are not
+        // updating the depth bugger.
+        // *** so then in a pixel - every point in that pixel get's drawn at the same depth, 
+        // **** according to where this layer is in the order?
+        // with shallowLayerTest always returning true, this renders properly
+        renderContext.gl.depthMask(false)
         switch (this._plotType$1) {
             case 0:
                 this.pointList.draw(renderContext, opacity * this.get_opacity(), false);

@@ -500,19 +500,6 @@ onMounted(() => {
     // @ts-expect-error this does exist
     WWTControl.singleton.shallowLayerTest = function(_layer) {
       return true;
-      // const table = layer.get__table();
-      // const rows = table.rows;
-      // const count = rows.length;
-      // const center = Math.floor(count / 2);
-      // const centerRow = rows[center];
-      // const x = Number(centerRow[layer.get_xAxisColumn()]);
-      // const y = Number(centerRow[layer.get_yAxisColumn()]);
-      // const z = Number(centerRow[layer.get_zAxisColumn()]);
-      // // @ts-expect-error this does exist
-      // const depth = WWTControl.singleton.getDepth(x, y, z);
-      // // @ts-expect-error this does exist
-      // const moonDepth = WWTControl.singleton.getDepth(0, 0, 0);
-      // return depth <= (moonDepth + 0.0000116 / 6); // magic number minor improvement to front side depth test
     }.bind(this);
 
     
