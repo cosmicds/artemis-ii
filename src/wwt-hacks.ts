@@ -759,6 +759,8 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
         this.pointList.timeSeries = this.timeSeries;
         this.pointList.jNow = jNow;
         this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+        // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/depthMask
+        renderContext.gl.depthMask(false) // we're depth buffered, but no writing to it. works, buuuuuuut??????
         switch (this._plotType$1) {
             case 0:
                 this.pointList.draw(renderContext, opacity * this.get_opacity(), false);
@@ -779,6 +781,7 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
             default:
                 break;
         }
+        renderContext.gl.depthMask(true);
     }
     if (this.lineList != null) {
         this.lineList.sky = this.get_astronomical();

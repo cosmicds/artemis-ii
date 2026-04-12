@@ -498,7 +498,7 @@ onMounted(() => {
     
   
     // @ts-expect-error this does exist
-    WWTControl.singleton.shallowLayerTest = function(layer) {
+    WWTControl.singleton.shallowLayerTest = function(_layer) {
       return true;
       // const table = layer.get__table();
       // const rows = table.rows;
