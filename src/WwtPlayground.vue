@@ -238,6 +238,7 @@ import {
   makeFrustum, 
   addToWWTRenderLoop,
   removeFromWWTRenderLoop,
+  spreadSheetLayerDraw,
   type CameraView 
 } from "./wwt-hacks";
 import { clampedTime } from "./utils";
@@ -333,6 +334,8 @@ function doWWTHacks() {
   WWTControl.singleton.renderContext.makeFrustum = makeFrustum.bind(WWTControl.singleton.renderContext);
   // @ts-expect-error this does exist
   LayerManager._draw = layerManagerDraw;
+  // @ts-expect-error this does exist
+  SpreadSheetLayer.prototype.draw = spreadSheetLayerDraw;
 }
 
 
@@ -408,12 +411,12 @@ function createArtemisLayers(trackedObject: SolarSystemObjects) {
     const data = items.slice(...bds).join("\r\n");
 
     // REMOVE: temp for degugging layer order
-    createHorizonsSpreadSheetLayer('Artemis Time', `${header}\r\n${data}`, 'Sky')
+    createHorizonsSpreadSheetLayer('Artemis', `${header}\r\n${data}`, 'Sky')
       .then(layer => {
-        layer.set_markerScale(MarkerScales.world);
+        layer.set_markerScale(MarkerScales.screen);
         layer.set_plotType(PlotTypes.gaussian);
-        layer.set_scaleFactor(0.0012);
-        layer.set_color(Color.fromHex("#00ffff")); // artemis
+        layer.set_scaleFactor(20);
+        layer.set_color(Color.fromHex("#ffffff")); // artemis
         layer.set_showFarSide(true);
         layer.set_opacity(100);
         layers.value.push(layer);
@@ -496,19 +499,20 @@ onMounted(() => {
   
     // @ts-expect-error this does exist
     WWTControl.singleton.shallowLayerTest = function(layer) {
-      const table = layer.get__table();
-      const rows = table.rows;
-      const count = rows.length;
-      const center = Math.floor(count / 2);
-      const centerRow = rows[center];
-      const x = Number(centerRow[layer.get_xAxisColumn()]);
-      const y = Number(centerRow[layer.get_yAxisColumn()]);
-      const z = Number(centerRow[layer.get_zAxisColumn()]);
-      // @ts-expect-error this does exist
-      const depth = WWTControl.singleton.getDepth(x, y, z);
-      // @ts-expect-error this does exist
-      const moonDepth = WWTControl.singleton.getDepth(0, 0, 0);
-      return depth <= (moonDepth + 0.0000116 / 6); // magic number minor improvement to front side depth test
+      return true;
+      // const table = layer.get__table();
+      // const rows = table.rows;
+      // const count = rows.length;
+      // const center = Math.floor(count / 2);
+      // const centerRow = rows[center];
+      // const x = Number(centerRow[layer.get_xAxisColumn()]);
+      // const y = Number(centerRow[layer.get_yAxisColumn()]);
+      // const z = Number(centerRow[layer.get_zAxisColumn()]);
+      // // @ts-expect-error this does exist
+      // const depth = WWTControl.singleton.getDepth(x, y, z);
+      // // @ts-expect-error this does exist
+      // const moonDepth = WWTControl.singleton.getDepth(0, 0, 0);
+      // return depth <= (moonDepth + 0.0000116 / 6); // magic number minor improvement to front side depth test
     }.bind(this);
 
     
