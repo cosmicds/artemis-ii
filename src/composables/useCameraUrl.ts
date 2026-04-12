@@ -2,9 +2,9 @@ import { engineStore } from "@wwtelescope/engine-pinia";
 import { WWTControl } from "@wwtelescope/engine";
 import { R2D } from "@wwtelescope/astro";
 import { moveViewCamera, type CameraView } from "../wwt-hacks";
-import { Ref, watch } from 'vue';
+import { watch, onMounted, ref } from 'vue';
 
-export function useCameraUrl(fallback: CameraView, successWatch: Ref<boolean>) {
+export function useCameraUrl(fallback: CameraView) {
   const store = engineStore();
 
   const lng         = () => ((360 - store.raRad * R2D) % 360);
@@ -13,6 +13,7 @@ export function useCameraUrl(fallback: CameraView, successWatch: Ref<boolean>) {
   const rotationDeg = () => store.rollRad * R2D;
   const angleDeg    = () => WWTControl.singleton.renderContext.viewCamera.angle;
   const time        = () => store.currentTime.getTime();
+  const successWatch = ref(false);
 
   function readUrl(): CameraView {
     const p = new URLSearchParams(window.location.search);
@@ -50,7 +51,11 @@ export function useCameraUrl(fallback: CameraView, successWatch: Ref<boolean>) {
     }
   });
   // Apply initial view from URL (or fallback) once.
-  moveViewCamera(readUrl(), true);
+  onMounted(() => {
+    store.waitForReady().then(() => {
+      moveViewCamera(readUrl(), true);
+    });
+  });
 
-  return { copyViewUrl };
+  return { copyViewUrl, copySuccess: successWatch };
 }

@@ -299,17 +299,8 @@ const EARTH_VIEW: CameraView = {
   angleDeg: 0,
   time: 1775474823266
 };
-// const HOME_VIEW: CameraView = {
-//   // lng: 169.906038,
-//   lng: 168.007573,
-//   // lat: 1.323000,
-//   lat: 3.591000,
-//   // zoomDeg: 0.000163,
-//   zoomDeg: 0.000157,
-//   rotationDeg: 0,
-//   angleDeg: 0,
-//   time: HOME_TIME.getTime()
-// };
+
+const { copyViewUrl, copySuccess } = useCameraUrl(INITIAL_VIEW);
 
 
 const currentTime = ref(INITIAL_TIME.value);
@@ -337,9 +328,7 @@ function doWWTHacks() {
 }
 
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-let copyViewUrl: () => Promise<void> = async () => {};
-const copySuccess = ref(false);
+
 
 
 const layers = ref<SpreadSheetLayer[]>([]);
@@ -532,7 +521,7 @@ onMounted(() => {
     createArtemisLayers(trackingCenter.value);
 
 
-    ({ copyViewUrl } = useCameraUrl(INITIAL_VIEW, copySuccess));
+    
     positionSet.value = true;
     layersLoaded.value = true;
   });
