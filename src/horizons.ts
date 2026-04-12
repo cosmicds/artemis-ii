@@ -1,5 +1,5 @@
-import { SpaceTimeController, Planets, Vector3d } from "@wwtelescope/engine";
-import { SolarSystemObjects } from "@wwtelescope/engine-types";
+import { SpaceTimeController, Planets, Vector3d, type SpreadSheetLayer } from "@wwtelescope/engine";
+import { SolarSystemObjects, AltUnits, CoordinatesType } from "@wwtelescope/engine-types";
 const FIVE_MINUTES = 5 * 60 * 1000;
 const D2S = 24 * 60 * 60;
 
@@ -87,4 +87,22 @@ export function getHorizonsStartEndTimes(horizonsCsvString: string): { start: Da
   const stepMs = new Date(secondLine.split(",")[1]).getTime() - startDate.getTime();
 
   return { start: startDate, end: endDate, deltaT: stepMs };
+}
+
+
+/**
+ * Setup the spreadsheet layer columns and
+ * coordinates after createTableLayer creates the layer
+ * then style the output.
+ */
+export function setupHorizonsSpreadSheetLayer(layer: SpreadSheetLayer) {
+  layer.set_xAxisColumn(2);
+  layer.set_yAxisColumn(3);
+  layer.set_zAxisColumn(4);
+  layer.set_coordinatesType(CoordinatesType.rectangular);
+  layer.set_astronomical(true);
+  layer.set_cartesianScale(AltUnits.astronomicalUnits);
+  layer.set_altUnit(AltUnits.astronomicalUnits);
+  layer.set_showFarSide(true);
+  return layer;
 }

@@ -243,7 +243,7 @@ import {
 import { clampedTime } from "./utils";
 
 
-import { parseHorizonsVectorsForWwt, getHorizonsStartEndTimes } from "./horizons";
+import { parseHorizonsVectorsForWwt, getHorizonsStartEndTimes, setupHorizonsSpreadSheetLayer } from "./horizons";
 import horizonsData from "@/assets/horizons_results-earth.txt?raw";
 
 import { useScaledZoom } from "./composables/useScaledZoom";
@@ -382,6 +382,13 @@ function createArtemisOrbitLineList(trackedObject: SolarSystemObjects) {
 }
 
 
+function createHorizonsSpreadSheetLayer(name: string, dataCsv: string, referenceFrame: string = 'Sky') {
+  return store.createTableLayer({
+    name,
+    referenceFrame: referenceFrame,
+    dataCsv,
+  }).then(setupHorizonsSpreadSheetLayer);
+};
 
 function createArtemisLayers(trackedObject: SolarSystemObjects) {
   const vec =   parseHorizonsVectorsForWwt(horizonsData, SolarSystemObjects.earth, trackedObject);
@@ -400,30 +407,20 @@ function createArtemisLayers(trackedObject: SolarSystemObjects) {
   bounds.forEach((bds) => {
     const data = items.slice(...bds).join("\r\n");
 
-    store.createTableLayer({
-      name: 'Artemis Time',
-      referenceFrame: 'Sky',
-      dataCsv: `${header}\r\n${data}`,
-    }).then(layer => {
-      layer.set_xAxisColumn(2);
-      layer.set_yAxisColumn(3);
-      layer.set_zAxisColumn(4);
-      layer.set_coordinatesType(CoordinatesType.rectangular);
-      layer.set_astronomical(true);
-      layer.set_cartesianScale(AltUnits.astronomicalUnits);
-      layer.set_altUnit(AltUnits.astronomicalUnits);
-      layer.set_markerScale(MarkerScales.screen);
-      layer.set_plotType(PlotTypes.gaussian);
-      layer.set_scaleFactor(25);
-      layer.set_color(Color.fromHex("#df1c23")); // artemis
-      layer.set_showFarSide(true);
-      layer.set_opacity(100);
-      layer.set_startDateColumn(1);
-      layer.set_endDateColumn(1);
-      layer.set_decay(4.9 / (60 * 24));
-      layer.set_timeSeries(true);
-      layers.value.push(layer);
-    });
+    createHorizonsSpreadSheetLayer('Artemis Time', `${header}\r\n${data}`, 'Sky')
+      .then(layer => {
+        layer.set_markerScale(MarkerScales.screen);
+        layer.set_plotType(PlotTypes.gaussian);
+        layer.set_scaleFactor(25);
+        layer.set_color(Color.fromHex("#df1c23")); // artemis
+        layer.set_showFarSide(true);
+        layer.set_opacity(100);
+        layer.set_startDateColumn(1);
+        layer.set_endDateColumn(1);
+        layer.set_decay(4.9 / (60 * 24));
+        layer.set_timeSeries(true);
+        layers.value.push(layer);
+      });
   });
 }
 
