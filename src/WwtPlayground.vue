@@ -335,6 +335,7 @@ function doWWTHacks() {
   // @ts-expect-error this does exist
   SpreadSheetLayer.prototype.draw = spreadSheetLayerDraw;
 
+  // @ts-expect-error this does exist
   BasePlanets.drawPointPlanet = drawPointPlanet;
 }
 
