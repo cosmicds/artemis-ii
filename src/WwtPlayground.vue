@@ -63,7 +63,7 @@
               @activate="() => showInfoSheet = !showInfoSheet"
             >
             </icon-button>
-            <button 
+            <button
               class="artemis-btn zoom-label"
               @click="zoomIn"
               @keyup.enter="zoomIn"
@@ -80,7 +80,7 @@
               :value="zoomSliderValue"
               @input="onZoomSlider"
             />
-            <button 
+            <button
               class="artemis-btn zoom-label"
               @click="zoomOut"
               @keyup.enter="zoomOut"
@@ -199,7 +199,7 @@
         :text-color="accentColor"
       />
     </div>
-    <WebGlTest 
+    <WebGlTest
       @webgl2-disabled="webglDisabled = true"
     />
   </v-app>
@@ -210,7 +210,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { engineStore } from "@wwtelescope/engine-pinia";
 import { supportsTouchscreen, useWWTKeyboardControls, CreditLogos, IconButton, useFullscreen } from "@cosmicds/vue-toolkit";
 import { useDisplay } from "vuetify";
-import { Color, SpreadSheetLayer, OrbitLineList, LayerManager, WWTControl, Vector3d } from "@wwtelescope/engine";
+import { BasePlanets, Color, SpreadSheetLayer, OrbitLineList, LayerManager, WWTControl, Vector3d } from "@wwtelescope/engine";
 import { MarkerScales, PlotTypes, SolarSystemObjects } from "@wwtelescope/engine-types";
 
 /* Component imports */
@@ -226,19 +226,20 @@ const webglDisabled = ref(false);
 
 /* local imports */
 import { useCameraUrl } from "./composables/useCameraUrl";
-import { 
-  moveViewCamera, 
-  layerManagerDraw, 
+import {
+  moveViewCamera,
+  layerManagerDraw,
   getCoordinatesForScreenPoint,
-  getScreenPointForCoordinates, 
-  transformPickPointToWorldSpace, 
-  transformWorldPointToPickSpace, 
+  getScreenPointForCoordinates,
+  transformPickPointToWorldSpace,
+  transformWorldPointToPickSpace,
   renderOneFrame,
-  makeFrustum, 
+  makeFrustum,
   addToWWTRenderLoop,
   removeFromWWTRenderLoop,
   spreadSheetLayerDraw,
-  type CameraView 
+  drawPointPlanet,
+  type CameraView
 } from "./wwt-hacks";
 import { clampedTime } from "./utils";
 
@@ -333,6 +334,8 @@ function doWWTHacks() {
   LayerManager._draw = layerManagerDraw;
   // @ts-expect-error this does exist
   SpreadSheetLayer.prototype.draw = spreadSheetLayerDraw;
+
+  BasePlanets.drawPointPlanet = drawPointPlanet;
 }
 
 
@@ -372,8 +375,8 @@ function createArtemisOrbitLineList(trackedObject: SolarSystemObjects) {
   });
   for (let i = 1; i < points.length; i++) {
     lineList.addLine(
-      points[i - 1], 
-      points[i], 
+      points[i - 1],
+      points[i],
       color,
       color,
     );
@@ -392,7 +395,7 @@ function createHorizonsSpreadSheetLayer(name: string, dataCsv: string, reference
 
 function createArtemisLayers(trackedObject: SolarSystemObjects) {
   const vec =   parseHorizonsVectorsForWwt(horizonsData, SolarSystemObjects.earth, trackedObject);
-  
+
   // REMOVE: temp for degugging layer order
   // createHorizonsSpreadSheetLayer('Artemis', vec, 'Sky')
   //   .then(layer => {
@@ -404,8 +407,8 @@ function createArtemisLayers(trackedObject: SolarSystemObjects) {
   //     layer.set_opacity(100);
   //     layers.value.push(layer);
   //   });
-    
-  
+
+
   createHorizonsSpreadSheetLayer('Artemis Time', vec, 'Sky')
     .then(layer => {
       layer.set_markerScale(MarkerScales.screen);
@@ -455,7 +458,7 @@ function removeArtemisOrbit() {
 }
 
 onMounted(() => {
-  
+
   if (webglDisabled.value) {
     showSplashScreen.value = false;
     // eslint-disable-next-lint @typescript-eslint/ban-ts-comment
@@ -480,7 +483,6 @@ onMounted(() => {
     store.applySetting(["solarSystemStars", showSkyBackground.value]);
     store.setTrackedObject(trackingCenter.value);
 
-    
     createArtemisOrbit();
     createArtemisLayers(trackingCenter.value);
 

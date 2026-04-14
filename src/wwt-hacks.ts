@@ -4,6 +4,7 @@
 import {
   Annotation,
   Constellations,
+  Dates,
   // @ts-expect-error Grid does exist
   Grids,
   ImageSetLayer,
@@ -12,6 +13,7 @@ import {
   Matrix3d,
   Planets,
   Planets3d,
+  PointList,
   RenderTriangle,
   Settings,
   SpaceTimeController,
@@ -397,11 +399,6 @@ export function renderOneFrame() {
         matLocal._multiply(Matrix3d.translation(vt));
         this.renderContext.set_world(matLocal);
         this.renderContext.makeFrustum();
-        
-        
-
-        this.renderContext.set_world(matOld);
-        this.renderContext.makeFrustum();
 
         if (this.renderContext.get_solarSystemCameraDistance() < 15000) {
             this.renderContext.setupMatricesSolarSystem(false);
@@ -699,7 +696,7 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
         this.triangleList.draw(renderContext, opacity * this.get_opacity(), 1);
     }
     if (this.pointList != null) {
-        // so this ends up causing gl.enable(gl.DEPTH_TEST) 
+        // so this ends up causing gl.enable(gl.DEPTH_TEST)
         // so that the test is run. if depth mask is true then buffers get written
         // that is, if it is in front it get's written
         // https://learnopengl.com/Advanced-OpenGL/Depth-testing
@@ -714,7 +711,7 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
         // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/depthMask
         // so we are running the depth test, but with this, then we are not
         // updating the depth bugger.
-        // *** so then in a pixel - every point in that pixel get's drawn at the same depth, 
+        // *** so then in a pixel - every point in that pixel get's drawn at the same depth,
         // **** according to where this layer is in the order?
 
         // const ogDepthMaskValue = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK)
@@ -741,7 +738,7 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
         }
         // renderContext.gl.depthMask(ogDepthMaskValue);
         renderContext.gl.depthMask(true); // checked. ogDepthMaskValue is true
-        
+
     }
     if (this.lineList != null) {
         this.lineList.sky = this.get_astronomical();
@@ -759,4 +756,42 @@ export function spreadSheetLayerDraw(renderContext, opacity, flat) {
         this.lineList2d.drawLines(renderContext, opacity * this.get_opacity());
     }
     return true;
+}
+
+export function drawPointPlanet(renderContext, location, size, color, zOrder) {
+    var center = location;
+    var rad = size / 2;
+    if (renderContext.gl != null) {
+        var ppList = new PointList(renderContext);
+        ppList.minSize = 20;
+        ppList.addPoint(location.copy(), color._clone(), new Dates(0, 1), size / 100);
+        ppList.depthBuffered = true;
+        renderContext.gl.depthMask(false);
+        ppList.draw(renderContext, 1, false);
+        renderContext.gl.depthMask(true);
+    }
+    else {
+        var screenSpacePnt = renderContext.WVP.transform(center);
+        if (screenSpacePnt.z < 0) {
+            return;
+        }
+        if (!zOrder) {
+            if (Vector3d.dot(renderContext.get_viewPoint(), center) < 0.55) {
+                return;
+            }
+        }
+        var ctx = renderContext.device;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(screenSpacePnt.x, screenSpacePnt.y, rad, 0, Math.PI * 2, true);
+        ctx.lineWidth = 1;
+        ctx.fillStyle = color.toString();
+        if (true) {
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = color.toString();
+        ctx.stroke();
+        ctx.restore();
+    }
 }

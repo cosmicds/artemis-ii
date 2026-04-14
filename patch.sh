@@ -19,11 +19,11 @@ reexport_line=$((${reexport_line} - 1))
 if [[ ! -z ${reexport_line} ]]
 then
     sed -i.bak "${reexport_line}a\\
-        Planets3d: () => (_render_globals_js__WEBPACK_IMPORTED_MODULE_X__.Planets3d),
+        Planets3d: () => (_render_globals_js__WEBPACK_IMPORTED_MODULE_X__.Planets3d), BasePlanets: () => (_render_globals_js__WEBPACK_IMPORTED_MODULE_Y__.BasePlanets),
     " ${filepath}
     import_line=$((reexport_line + 5))
     sed -i.bak "${import_line}a\\
-        var _render_globals_js__WEBPACK_IMPORTED_MODULE_X__ = __webpack_require__('./esm/planets_3d.js'); 
+    var _render_globals_js__WEBPACK_IMPORTED_MODULE_X__ = __webpack_require__('./esm/planets_3d.js'); var _render_globals_js__WEBPACK_IMPORTED_MODULE_Y__ = __webpack_require__('./esm/baseplanets.js');
     " ${filepath}
     rm ${filepath}.bak
 fi

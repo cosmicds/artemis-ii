@@ -8,6 +8,13 @@ import { SolarSystemObjects } from "@wwtelescope/engine-types";
 
 declare module "@wwtelescope/engine" {
 
+  export class BasePlanets {
+    drawPointPlanet(renderContext: RenderContext, location: Vector3d, size: number, color: Color, zOrder: number);
+  }
+
+  export class Dates {};
+  export class PointList {};
+
   // this seems to be the write way to extend the class. do a normal import
   // and ts will merge? this interface. idk really.
   interface RenderContext  {
@@ -41,7 +48,7 @@ declare module "@wwtelescope/engine" {
     raDecTo3d(ra: number, dec: number): Vector3d;
     horizonToEquitorial(altAz: Coordinates, location: Coordinates, utc: Date): Coordinates;
   }
-  
+
   namespace Vector3d {
     function addVectors(left: Vector3d, right: Vector3d): Vector3d;
     function negate(left: Vector3d, right: Vector3d): Vector3d;
@@ -100,11 +107,11 @@ declare module "@wwtelescope/engine" {
     static drawPlanets3D(renderContext: renderContext, opacity: number, centerPoint: Vector3d);
   }
 
-  
+
   namespace Planets {
     function getPlanet3dLocationJD(target: SolarSystemObjects, jNow: number): Vector3d;
   }
-  
+
     // this on the other hand is not exported at all, so we create the class declaration here
   export class OrbitLineList {
     addLine(pt1: Vector3d, pt2: Vector3d, color1: Color, color2: Color): void;
